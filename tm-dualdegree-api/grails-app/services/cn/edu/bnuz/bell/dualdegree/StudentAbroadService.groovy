@@ -4,12 +4,15 @@ import cn.edu.bnuz.bell.dualdegree.eto.StudentAbroadEto
 import cn.edu.bnuz.bell.master.Major
 import cn.edu.bnuz.bell.organization.Teacher
 import cn.edu.bnuz.bell.security.SecurityService
+import cn.edu.bnuz.bell.security.UserLogService
+import grails.converters.JSON
 import grails.gorm.transactions.Transactional
 
 @Transactional
 class StudentAbroadService {
     SecurityService securityService
     StudentValidateService studentValidateService
+    UserLogService userLogService
 
     /**
      * 出国学生列表
@@ -65,12 +68,13 @@ where d.id in (:departments) and sa.enabled is true
     select st, :user, now(), :agreementRegion, true from Student st where st.id in (:ids) 
 ''',[user: me, agreementRegion: region, ids: students]
 //      写入自助打印系统
-        if (studentsEto && studentsEto.size()) {
-            StudentAbroadEto.executeUpdate'''
-    insert into StudentAbroadEto (studentId, studentName, dateCreated, creator, enabled, region)
-    select st.id, st.name, now(), :userId, true, :agreementRegion from Student st where st.id in (:ids) 
-''',[userId: me.id, agreementRegion: region.name, ids: studentsEto]
-        }
+//        if (studentsEto && studentsEto.size()) {
+//            StudentAbroadEto.executeUpdate'''
+//    insert into StudentAbroadEto (studentId, studentName, dateCreated, creator, enabled, region)
+//    select st.id, st.name, now(), :userId, true, :agreementRegion from Student st where st.id in (:ids)
+//''',[userId: me.id, agreementRegion: region.name, ids: studentsEto]
+//        }
+        userLogService.log(securityService.userId,securityService.ipAddress,"CREATE", students.size(),"批量导入出国学生")
         return null
     }
 
@@ -81,8 +85,14 @@ where d.id in (:departments) and sa.enabled is true
      */
     def delete(Long id) {
         def form = StudentAbroad.get(id)
-        if (form) {
+        if (form && form.student.department.id == securityService.departmentId) {
             form.delete()
+            userLogService.log(securityService.userId,securityService.ipAddress,"DELETE", form, "${form as JSON}")
+            // 同步删除自助打印系统上名单
+//            def studentEto = StudentAbroadEto.findByStudentId(form.student.id)
+//            if (studentEto) {
+//                studentEto.delete()
+//            }
         }
     }
 
