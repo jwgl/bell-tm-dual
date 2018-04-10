@@ -3,6 +3,7 @@ package cn.edu.bnuz.bell.dualdegree
 import cn.edu.bnuz.bell.http.BadRequestException
 import cn.edu.bnuz.bell.http.ForbiddenException
 import cn.edu.bnuz.bell.http.NotFoundException
+import cn.edu.bnuz.bell.utils.ZipTools
 import cn.edu.bnuz.bell.workflow.Event
 import cn.edu.bnuz.bell.workflow.ListCommand
 import cn.edu.bnuz.bell.workflow.ListType
@@ -92,5 +93,16 @@ class PaperApprovalController {
             renderBadRequest()
         }
 
+    }
+
+    def attachments(String approverId, Long awardId) {
+        def students = paperApprovalService.findUsers(approverId, awardId)
+        def basePath = "${filesPath}/${awardId}/"
+        def zipTools = new ZipTools()
+        response.setHeader("Content-disposition",
+                "attachment; filename=\"" + URLEncoder.encode("待审论文.zip", "UTF-8") + "\"")
+        response.contentType = "application/zip"
+        response.outputStream << zipTools.zip(students, basePath, 'paper')
+        response.outputStream.flush()
     }
 }

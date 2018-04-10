@@ -42,6 +42,7 @@ select new map(
   adminClass.name as className,
   form.dateSubmitted as date,
   paperApprover.name as paperApprover,
+  award.id as awardId,
   form.status as status
 )
 from DegreeApplication form
@@ -51,10 +52,10 @@ join form.award award
 join form.approver approver
 left join form.paperApprover paperApprover
 where current_date between award.requestBegin and award.approvalEnd
-and
-((approver.id = :teacherId and form.status = :status1) or (paperApprover.id = :teacherId and form.status = :status2))
+and form.status = :status 
+and (approver.id = :teacherId  or paperApprover.id = :teacherId )
 order by form.datePaperSubmitted
-''',[teacherId: teacherId, status1: State.STEP3, status2: State.STEP4], args
+''',[teacherId: teacherId, status: State.STEP4], args
     }
 
     def findDoneList(String teacherId, Map args) {
@@ -76,9 +77,9 @@ join form.approver approver
 left join form.paperApprover paperApprover
 where (approver.id = :teacherId or paperApprover.id = :teacherId)
 and form.datePaperApproved is not null
-and form.status = :status
+and form.status <> :status
 order by form.datePaperApproved desc
-''',[teacherId: teacherId, status: State.FINISHED], args
+''',[teacherId: teacherId, status: State.STEP4], args
     }
 
     def countTodoList(String teacherId) {
@@ -89,9 +90,9 @@ join form.award award
 join form.approver approver
 left join form.paperApprover paperApprover
 where current_date between award.requestBegin and award.approvalEnd
-and
-((approver.id = :teacherId and form.status = :status1) or (paperApprover.id = :teacherId and form.status = :status2))
-''', [teacherId: teacherId, status1: State.STEP3, status2: State.STEP4]
+and form.status = :status 
+and (approver.id = :teacherId  or paperApprover.id = :teacherId )
+''', [teacherId: teacherId, status: State.STEP4]
     }
 
     def countDoneList(String teacherId) {
@@ -101,9 +102,9 @@ from DegreeApplication form
 join form.approver approver
 left join form.paperApprover paperApprover
 where form.datePaperApproved is not null
-and form.status = :status
+and form.status <> :status
 and (approver.id = :teacherId or paperApprover.id = :teacherId)
-''', [teacherId: teacherId, status: State.FINISHED]
+''', [teacherId: teacherId, status: State.STEP4]
     }
 
     def getCounts(String teacherId) {
@@ -180,21 +181,21 @@ from DegreeApplication form join form.award award
 join form.approver approver
 left join form.paperApprover paperApprover
 where current_date between award.requestBegin and award.approvalEnd
-and
-((approver.id = :teacherId and form.status = :status1) or (paperApprover.id = :teacherId and form.status = :status2))
+and form.status = :status 
+and (approver.id = :teacherId  or paperApprover.id = :teacherId )
 and form.datePaperSubmitted < (select datePaperSubmitted from DegreeApplication where id = :id)
 order by form.datePaperSubmitted desc
-''', [teacherId: teacherId, id: id, status1: State.STEP3, status2: State.STEP4])
+''', [teacherId: teacherId, id: id, status: State.STEP4])
             case ListType.DONE:
                 return dataAccessService.getLong('''
 select form.id
 from DegreeApplication form
-where form.paperApprover.id = :teacherId
+where (form.paperApprover.id = :teacherId or form.approver.id = :teacherId)
 and form.datePaperApproved is not null
 and form.status <> :status
 and form.datePaperSubmitted < (select datePaperSubmitted from DegreeApplication where id = :id)
 order by form.datePaperSubmitted desc
-''', [teacherId: teacherId, id: id, status: State.STEP3])
+''', [teacherId: teacherId, id: id, status: State.STEP4])
         }
     }
 
@@ -207,21 +208,21 @@ from DegreeApplication form join form.award award
 join form.approver approver
 left join form.paperApprover paperApprover
 where current_date between award.requestBegin and award.approvalEnd
-and
-((approver.id = :teacherId and form.status = :status1) or (paperApprover.id = :teacherId and form.status = :status2))
+and form.status = :status 
+and (approver.id = :teacherId  or paperApprover.id = :teacherId )
 and form.datePaperSubmitted > (select datePaperSubmitted from DegreeApplication where id = :id)
 order by form.datePaperSubmitted asc
-''', [teacherId: teacherId, id: id, status1: State.STEP3, status2: State.STEP4])
+''', [teacherId: teacherId, id: id, status: State.STEP4])
             case ListType.DONE:
                 return dataAccessService.getLong('''
 select form.id
 from DegreeApplication form
-where form.paperApprover.id = :teacherId
+where (form.paperApprover.id = :teacherId or form.approver.id = :teacherId)
 and form.datePaperApproved is not null
 and form.status <> :status
-and form.datePaperApproved < (select datePaperApproved from DegreeApplication where id = :id)
-order by form.datePaperApproved desc
-''', [teacherId: teacherId, id: id, status: State.STEP3])
+and form.datePaperApproved > (select datePaperApproved from DegreeApplication where id = :id)
+order by form.datePaperApproved asc
+''', [teacherId: teacherId, id: id, status: State.STEP4])
         }
     }
 
@@ -230,19 +231,24 @@ order by form.datePaperApproved desc
         if (form.approver.id != teacherId && form.paperApprover.id != teacherId) {
             throw new BadRequestException()
         }
+        // 如果是管理员替导师操作
+        def paperApprover = teacherId
+        if (form.approver.id == teacherId) {
+            paperApprover = form.paperApprover.id
+        }
         def workitem = Workitem.findByInstanceAndActivityAndToAndDateProcessedIsNull(
                 WorkflowInstance.load(form.workflowInstanceId),
                 WorkflowActivity.load("${DegreeApplication.WORKFLOW_ID}.review"),
-                User.load(teacherId),
+                User.load(paperApprover),
         )
         if (!workitem) {
             workitem = Workitem.findByInstanceAndActivityAndToAndDateProcessedIsNull(
                     WorkflowInstance.load(form.workflowInstanceId),
                     WorkflowActivity.load("${DegreeApplication.WORKFLOW_ID}.finish"),
-                    User.load(teacherId),
+                    User.load(paperApprover),
             )
         }
-        domainStateMachineHandler.reject(form, teacherId, 'finish', cmd.comment, workitem.id)
+        domainStateMachineHandler.reject(form, paperApprover, 'finish', cmd.comment, workitem.id)
         form.datePaperApproved = new Date()
         form.save()
     }
@@ -278,5 +284,19 @@ order by form.datePaperApproved desc
         domainStateMachineHandler.finish(form, teacherId, workitem.id)
         form.datePaperApproved = new Date()
         form.save()
+    }
+
+    def findUsers(String teacherId, Long awardId) {
+        DegreeApplication.executeQuery '''
+select new map(
+    student.id as id, 
+    student.name as name
+)
+from DegreeApplication form
+join form.student student
+join form.award award
+where (form.paperApprover.id = :teacherId or form.approver.id = :teacherId) 
+and award.id = :awardId and form.status = :status
+''',[teacherId: teacherId, awardId: awardId, status: State.STEP4]
     }
 }

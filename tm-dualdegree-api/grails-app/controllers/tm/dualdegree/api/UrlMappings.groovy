@@ -43,6 +43,9 @@ class UrlMappings {
             "/papers"(resources: 'paperApproval') {
                 "/workitems"(resources: 'paperApproval', includes: ['show', 'patch'])
                 "/upload"(controller: 'paperApproval', action: 'upload', method: 'POST')
+                collection {
+                    "/attachments"(controller: 'paperApproval', action: 'attachments', method: 'GET')
+                }
             }
             "/papermentors"(resources: 'paperMentor') {
                 "/tousers"(controller: 'paperMentor', action: 'tousers', method: 'GET')
