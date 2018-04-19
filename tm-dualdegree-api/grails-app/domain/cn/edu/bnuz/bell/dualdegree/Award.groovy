@@ -39,7 +39,7 @@ class Award {
         table                   schema: 'tm_dual'
         id                      generator: 'identity', comment: '工作ID'
         title                   length: 100, comment: '标题'
-        content                 length: 1000,comment: '内容'
+        content                 length: 1500,comment: '内容'
         requestBegin            comment: '申请起始'
         requestEnd              comment: '申请截止'
         paperEnd                comment: '论文提交截止'

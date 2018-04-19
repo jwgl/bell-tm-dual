@@ -232,15 +232,17 @@ where d.id = :department
 
     void next(String userId, AcceptCommand cmd, UUID workitemId) {
         DegreeApplication form = DegreeApplication.get(cmd.id)
-        domainStateMachineHandler.next(form, userId, 'finish', cmd.comment, workitemId, cmd.to)
-        form.paperApprover = Teacher.load(cmd.to)
-        form.save()
+        if (form.award.betweenCheckDateRange()) {
+            domainStateMachineHandler.next(form, userId, 'finish', cmd.comment, workitemId, cmd.to)
+            form.paperApprover = Teacher.load(cmd.to)
+            form.save()
+        }
     }
 
     def setMentor(String userId, PaperMentorCommand cmd) {
         cmd.ids.each { id ->
             def form = DegreeApplication.get(id)
-            if (form) {
+            if (form && form.award.betweenCheckDateRange()) {
                 def workitem = Workitem.findByInstanceAndActivityAndToAndDateProcessedIsNull(
                         WorkflowInstance.load(form.workflowInstanceId),
                         WorkflowActivity.load("${DegreeApplication.WORKFLOW_ID}.review"),
@@ -259,8 +261,10 @@ where d.id = :department
         if (form.approver.id != teacherId) {
             throw new BadRequestException()
         }
-        domainStateMachineHandler.reject(form, teacherId, 'review', cmd.comment, id)
-        form.paperApprover = null
-        form.save()
+        if (form.award.betweenCheckDateRange()) {
+            domainStateMachineHandler.reject(form, teacherId, 'review', cmd.comment, id)
+            form.paperApprover = null
+            form.save()
+        }
     }
 }

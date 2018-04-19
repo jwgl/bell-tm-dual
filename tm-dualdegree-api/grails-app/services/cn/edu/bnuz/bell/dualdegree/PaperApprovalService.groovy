@@ -248,9 +248,12 @@ order by form.datePaperApproved asc
                     User.load(paperApprover),
             )
         }
-        domainStateMachineHandler.reject(form, paperApprover, 'finish', cmd.comment, workitem.id)
-        form.datePaperApproved = new Date()
-        form.save()
+
+        if (form.award.betweenCheckDateRange()) {
+            domainStateMachineHandler.reject(form, paperApprover, 'finish', cmd.comment, workitem.id)
+            form.datePaperApproved = new Date()
+            form.save()
+        }
     }
 
     def finish(String teacherId, Long id) {
@@ -281,9 +284,11 @@ order by form.datePaperApproved asc
             )
         }
 
-        domainStateMachineHandler.finish(form, teacherId, workitem.id)
-        form.datePaperApproved = new Date()
-        form.save()
+        if (form.award.betweenCheckDateRange()) {
+            domainStateMachineHandler.finish(form, teacherId, workitem.id)
+            form.datePaperApproved = new Date()
+            form.save()
+        }
     }
 
     def findUsers(String teacherId, Long awardId) {

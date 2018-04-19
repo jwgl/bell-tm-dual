@@ -199,22 +199,28 @@ order by form.dateApproved desc
 
     void next(String userId, AcceptCommand cmd, UUID workitemId) {
         DegreeApplication form = DegreeApplication.get(cmd.id)
-        domainStateMachineHandler.next(form, userId, Activities.APPROVE, cmd.comment, workitemId, cmd.to)
-        form.dateApproved = new Date()
-        form.save()
+        if (form.award.betweenCheckDateRange()) {
+            domainStateMachineHandler.next(form, userId, Activities.APPROVE, cmd.comment, workitemId, cmd.to)
+            form.dateApproved = new Date()
+            form.save()
+        }
     }
 
     void reject(String userId, RejectCommand cmd, UUID workitemId) {
         DegreeApplication form = DegreeApplication.get(cmd.id)
-        domainStateMachineHandler.reject(form, userId, Activities.APPROVE, cmd.comment, workitemId)
-        form.dateApproved = new Date()
-        form.save()
+        if (form.award.betweenCheckDateRange()) {
+            domainStateMachineHandler.reject(form, userId, Activities.APPROVE, cmd.comment, workitemId)
+            form.dateApproved = new Date()
+            form.save()
+        }
     }
 
     void setPaperApprover(Long id, String teacherId) {
         def form = DegreeApplication.load(id)
-        form.setPaperApprover(Teacher.load(teacherId))
-        form.save()
+        if (form.award.betweenCheckDateRange()) {
+            form.setPaperApprover(Teacher.load(teacherId))
+            form.save()
+        }
     }
 
     def tousers(Long id) {
