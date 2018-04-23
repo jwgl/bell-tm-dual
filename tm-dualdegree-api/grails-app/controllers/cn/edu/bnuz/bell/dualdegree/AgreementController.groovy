@@ -10,7 +10,9 @@ class AgreementController {
 	AgreementService agreementService
 
     def index() {
-        renderJson(agreementService.list())
+        def cmd = new AgreementFilterCommand()
+        bindData(cmd, params)
+        renderJson(agreementService.list(cmd))
     }
 
     /**

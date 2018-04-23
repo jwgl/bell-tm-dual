@@ -17,9 +17,9 @@ class AgreementService {
     /**
      * 协议列表
      */
-    def list() {
-        Agreement.executeQuery '''
-select new map(
+    def list(AgreementFilterCommand cmd) {
+        def queryStr = '''
+select distinct new map(
     agreement.id                as      id,
     agreement.name              as      name,
     gr.name                     as      regionName,
@@ -28,8 +28,27 @@ select new map(
     agreement.memo              as      memo
 )
 from Agreement agreement join agreement.region gr
-order by agreement.id
+join agreement.item item
+join item.major major
+join major.department department
+join major.subject subject
+where agreement.name like :name
+and gr.name like :regionName
+and department.name like :departmentName
+and subject.name like :subjectName
+and major.grade = :grade
+and agreement.universityCn like :universityCn
+order by agreement.name
 '''
+        if (!cmd.grade) queryStr = queryStr.replace('major.grade', ':grade')
+        def results = Agreement.executeQuery queryStr,
+                [name: cmd.name ? "%${cmd.name}%" : '%',
+                 regionName: cmd.regionName ?: '%',
+                 departmentName: cmd.department ?: '%',
+                 grade: cmd.grade ?: 1,
+                 subjectName: cmd.subjectName ?: '%',
+                 universityCn: cmd.universityCn ? "%${cmd.name}%" : '%']
+        return [list: results, majors: this.majors, regions: this.regions]
     }
 
     /**
@@ -84,10 +103,11 @@ select new map(
     major.grade     as grade,
     subject.name    as subjectName,
     department.id   as departmentId,
+    department.enabled as enabled,
     department.name as departmentName    
 )
 from Major major join major.subject subject join major.department department
-where subject.isDualDegree is true and department.enabled is true
+where subject.isDualDegree is true
 order by department.name, subject.name, major.grade
 '''
     }
