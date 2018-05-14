@@ -37,4 +37,8 @@ class PaperForm {
         name                  length: 255, comment: '互认课程名称'
         form                  comment: '关联表单'
     }
+
+    static constraints = {
+        name    nullable: true
+    }
 }

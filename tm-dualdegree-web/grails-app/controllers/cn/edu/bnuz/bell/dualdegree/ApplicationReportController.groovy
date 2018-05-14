@@ -29,6 +29,7 @@ class ApplicationReportController {
                 format = 'pdf'
                 break
             case 'paper-approval-all':
+            case 'pass-list':
                 parameters = [department_id: securityService.departmentId, award_id: awardId]
                 format = 'pdf'
                 break
