@@ -43,7 +43,8 @@ select new map(
 )
 from DegreeApplication da 
 right join da.award ba with da.student.id = :userId
-where ba.approvalEnd >= :date and ba.department.id = :departmentId
+where (ba.approvalEnd >= :date or da.student is not null)
+and ba.department.id = :departmentId
 ''', [userId: userId, date: LocalDate.now(),departmentId: securityService.departmentId]
     }
 

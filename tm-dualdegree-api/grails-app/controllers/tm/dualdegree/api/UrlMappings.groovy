@@ -7,6 +7,7 @@ class UrlMappings {
         "/agreements"(resources: 'agreement')
         "/agreement-publics"(resources: 'agreementPublic', includes: ['index', 'show'])
         "/settings"(resources: 'setting')
+        "/finders"(resources: 'applicationFinder')
 
         "/departments"(resources: 'department', includes: []) {
             "/students"(resources: 'studentAbroad')

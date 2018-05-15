@@ -2,6 +2,7 @@ menuGroup 'main', {
     dualDegree 60, {
         agreementAdmin      10, 'PERM_DUALDEGREE_AGREEMENT_WRITE',  '/web/dualdegree/agreements'
         setting             20, 'PERM_DUALDEGREE_ADMIN', '/web/dualdegree/settings'
+        finder              21, 'PERM_DUALDEGREE_ADMIN', '/web/dualdegree/finders'
         agreementPublicDept 30, 'PERM_DUALDEGREE_DEPT_ADMIN', '/web/dualdegree/departments/${departmentId}/agreements'
         studentAbroad       31, 'PERM_DUALDEGREE_DEPT_ADMIN', '/web/dualdegree/departments/${departmentId}/students'
         mentor              32, 'PERM_DUALDEGREE_DEPT_ADMIN', '/web/dualdegree/departments/${departmentId}/mentors'
