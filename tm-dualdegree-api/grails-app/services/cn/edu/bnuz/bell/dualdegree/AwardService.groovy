@@ -125,8 +125,4 @@ where award.id = :id
             return form
         }
     }
-
-    def getMessage() {
-        return [title: '英国留学项目']
-    }
 }

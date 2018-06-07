@@ -66,6 +66,7 @@ order by agreement.name
             form.addToItem(new AgreementMajor(
                     major: Major.load(item.id),
                     majorOptions: item.majorOptions,
+                    majorOptionsCn: item.majorOptionsCn,
                     dateCreated: new Date()
             ))
 
@@ -206,6 +207,7 @@ where agreement.id = :id
                     form.addToItem(new AgreementMajor(
                             major: major,
                             majorOptions: item.majorOptions,
+                            majorOptionsCn: item.majorOptionsCn,
                             dateCreated: new Date()
                     ))
                 }
@@ -233,6 +235,7 @@ where agreement.id = :id
         AgreementMajor.executeQuery'''
 select new map(
     major.id            as id,
+    item.agreement.id   as agreementId,
     item.majorOptions   as majorOptions,
     major.grade         as grade,
     subject.name        as subjectName,
@@ -291,5 +294,14 @@ order by subject.name, gr.name, agreement.universityEn, major.grade, item.majorO
                 ),
         ]
         return CollectionUtils.groupBy(list, conditions)
+    }
+
+    def getMajorOptionCn(agreementId, majorId) {
+        def result = AgreementMajor.executeQuery '''
+select new map(ag.majorOptionsCn as majorOptionsCn)
+from AgreementMajor ag
+where ag.agreement.id = :agreementId and ag.major.id = :majorId 
+''', [agreementId: agreementId, majorId: majorId]
+        return result ? result[0] : []
     }
 }

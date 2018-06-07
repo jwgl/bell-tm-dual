@@ -25,6 +25,7 @@ class StudentAbroad {
     }
 
     static constraints = {
+        student         unique: true
         agreementRegion nullable: true
     }
 }

@@ -4,10 +4,19 @@ class UrlMappings {
 
     static mappings = {
 
-        "/agreements"(resources: 'agreementForm', includes: ['index'])
-        "/agreement-publics"(resources: 'agreementPublic', includes: ['index'])
-        "/settings"(resources: 'setting', includes: ['index'])
-        "/finders"(resources: 'applicationFinder', includes: ['index'])
+        "/users"(resources: 'user', includes: []) {
+            "/agreements"(resources: 'agreementForm', includes: ['index'])
+        }
+
+        "/agreements"(resources: 'agreementPublic', includes: ['index'])
+
+        group "/settings", {
+            "/users"(resources: 'setting', includes: ['index'])
+        }
+
+        group "/admin", {
+            "/applications"(resources: 'applicationFinder', includes: ['index'])
+        }
 
         "/departments"(resources: 'department', includes: []) {
             "/students"(resources: 'studentAbroad', includes: ['index'])
@@ -23,6 +32,9 @@ class UrlMappings {
         "/approvers"(resources: 'approver', includes: []) {
             "/applications"(resources: 'applicationApproval', includes: ['index'])
             "/papermentors"(resources: 'paperMentor', includes: ['index'])
+        }
+
+        "/mentors"(resources: 'approver', includes: []) {
             "/papers"(resources: 'paperApproval', includes: ['index'])
         }
 

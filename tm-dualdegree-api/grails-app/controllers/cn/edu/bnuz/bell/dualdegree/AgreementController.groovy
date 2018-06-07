@@ -62,4 +62,11 @@ class AgreementController {
                 majors: agreementService.majors
         ])
     }
+
+    /**
+     * 查看可衔接专业（中文）
+     */
+    def getMajorOptionCn(Long agreementId, Integer majorId) {
+        renderJson(agreementService.getMajorOptionCn(agreementId, majorId))
+    }
 }

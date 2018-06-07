@@ -19,6 +19,7 @@ class AgreementCommand {
          */
         Integer id
         String majorOptions
+        String majorOptionsCn
     }
 
 }

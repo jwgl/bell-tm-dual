@@ -12,7 +12,9 @@ class AgreementPublicController {
     SecurityService securityService
 
     def index() {
-        renderJson(agreementService.list())
+        def cmd = new AgreementFilterCommand()
+        bindData(cmd, params)
+        renderJson(agreementService.list(cmd))
     }
 
     def show(Long id) {

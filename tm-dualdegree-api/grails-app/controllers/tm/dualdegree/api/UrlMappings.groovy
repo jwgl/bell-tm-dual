@@ -4,10 +4,21 @@ class UrlMappings {
 
     static mappings = {
 
-        "/agreements"(resources: 'agreement')
-        "/agreement-publics"(resources: 'agreementPublic', includes: ['index', 'show'])
-        "/settings"(resources: 'setting')
-        "/finders"(resources: 'applicationFinder')
+        "/users"(resources: 'user', includes:[]){
+            "/agreements"(resources: 'agreement') {
+                "/getMajorOptionCn"(controller: 'agreement', action: 'getMajorOptionCn', method: 'GET')
+            }
+        }
+
+        "/agreements"(resources: 'agreementPublic', includes: ['index', 'show'])
+
+        group "/settings", {
+            "/users"(resources: 'setting')
+        }
+
+        group "/admin", {
+            "/applications"(resources: 'applicationFinder')
+        }
 
         "/departments"(resources: 'department', includes: []) {
             "/students"(resources: 'studentAbroad')
@@ -41,16 +52,19 @@ class UrlMappings {
                     "/mentors"(controller: 'mentor', action: 'index', method: 'GET')
                 }
             }
+            "/papermentors"(resources: 'paperMentor') {
+                "/tousers"(controller: 'paperMentor', action: 'tousers', method: 'GET')
+                "/workitems"(resources: 'paperMentor', includes: ['show', 'patch'])
+            }
+        }
+
+        "/mentors"(resources: 'mentor', includes: []) {
             "/papers"(resources: 'paperApproval') {
                 "/workitems"(resources: 'paperApproval', includes: ['show', 'patch'])
                 "/upload"(controller: 'paperApproval', action: 'upload', method: 'POST')
                 collection {
                     "/attachments"(controller: 'paperApproval', action: 'attachments', method: 'GET')
                 }
-            }
-            "/papermentors"(resources: 'paperMentor') {
-                "/tousers"(controller: 'paperMentor', action: 'tousers', method: 'GET')
-                "/workitems"(resources: 'paperMentor', includes: ['show', 'patch'])
             }
         }
 
