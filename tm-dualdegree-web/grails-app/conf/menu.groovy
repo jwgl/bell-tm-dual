@@ -9,8 +9,8 @@ menuGroup 'main', {
         apply               16, 'PERM_DUALDEGREE_WRITE', '/web/dualdegree/students/${userId}/applications'
         agreements          17, 'PERM_DUALDEGREE_AGREEMENT_READ', '/web/dualdegree/agreements'
         approval            70, {
-            applicationApproval 71, 'PERM_DUALDEGREE_DEPT_ADMIN', '/web/dualdegree/approvers/${userId}/applications'
-            paperMentor         72, 'PERM_DUALDEGREE_DEPT_ADMIN', '/web/dualdegree/approvers/${userId}/papermentors'
+            applicationCheck    71, 'PERM_DUALDEGREE_DEPT_ADMIN', '/web/dualdegree/checkers/${userId}/applications'
+            paperMentor         72, 'PERM_DUALDEGREE_DEPT_ADMIN', '/web/dualdegree/checkers/${userId}/papers'
             paperApproval       73, 'PERM_DUALDEGREE_PAPER_APPROVE', '/web/dualdegree/mentors/${userId}/papers'
         }
     }

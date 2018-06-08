@@ -72,7 +72,7 @@ where da.id = :id and da.student.id = :studentId
         DegreeApplication form = DegreeApplication.get(cmd.id)
         def workitem = Workitem.findByInstanceAndActivityAndToAndDateProcessedIsNull(
                 WorkflowInstance.load(form.workflowInstanceId),
-                WorkflowActivity.load("${DegreeApplication.WORKFLOW_ID}.process"),
+                WorkflowActivity.load("${DegreeApplication.WORKFLOW_ID}.submitPaper"),
                 User.load(userId),
         )
         if (!workitem) {
@@ -82,7 +82,7 @@ where da.id = :id and da.student.id = :studentId
                     User.load(userId),
             )
         }
-        domainStateMachineHandler.next(form, userId, 'process', cmd.comment, workitem.id, cmd.to)
+        domainStateMachineHandler.next(form, userId, 'submitPaper', cmd.comment, workitem.id, cmd.to)
         form.datePaperSubmitted = new Date()
         form.save()
     }

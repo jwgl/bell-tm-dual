@@ -120,7 +120,7 @@ class DegreeApplicationStateMachineConfiguration extends EnumStateMachineConfigu
 
     @Bean
     Action<State, Event> submittedEntryAction() {
-        new SubmittedEntryAction(Activities.APPROVE)
+        new SubmittedEntryAction(Activities.CHECK)
     }
 
     @Bean
@@ -138,7 +138,7 @@ class DegreeApplicationStateMachineConfiguration extends EnumStateMachineConfigu
                             event.comment,
                             event.ipAddress,
                             event.toUser,
-                            'process',
+                            'submitPaper',
                     )
 
                 } else if (data instanceof RejectEventData) {
@@ -161,11 +161,11 @@ class DegreeApplicationStateMachineConfiguration extends EnumStateMachineConfigu
 
     @Bean
     Action<State, Event> progressEntryAction() {
-        new ManualEntryAction('review')
+        new ManualEntryAction('checkPaper')
     }
 
     @Bean
     Action<State, Event> finishEntryAction() {
-        new ManualEntryAction('finish')
+        new ManualEntryAction('approvePaper')
     }
 }

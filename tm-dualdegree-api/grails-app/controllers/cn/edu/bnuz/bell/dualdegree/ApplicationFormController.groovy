@@ -98,12 +98,12 @@ class ApplicationFormController {
      * @param applicationFormId 申请Id
      * @return 审核人列表
      */
-    def approvers(Long applicationFormId) {
+    def checkers(Long applicationFormId) {
         def form = DegreeApplication.load(applicationFormId)
         if (!form) {
             renderBadRequest()
         } else {
-            renderJson applicationReviewerService.getApprovers(applicationFormId)
+            renderJson applicationReviewerService.getCheckers(applicationFormId)
         }
     }
 

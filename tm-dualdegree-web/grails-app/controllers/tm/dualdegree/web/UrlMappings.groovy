@@ -29,9 +29,9 @@ class UrlMappings {
             "/applications"(resources: 'applicationForm', includes: ['index'])
         }
 
-        "/approvers"(resources: 'approver', includes: []) {
-            "/applications"(resources: 'applicationApproval', includes: ['index'])
-            "/papermentors"(resources: 'paperMentor', includes: ['index'])
+        "/checkers"(resources: 'checker', includes: []) {
+            "/applications"(resources: 'applicationCheck', includes: ['index'])
+            "/papers"(resources: 'paperMentor', includes: ['index'])
         }
 
         "/mentors"(resources: 'approver', includes: []) {

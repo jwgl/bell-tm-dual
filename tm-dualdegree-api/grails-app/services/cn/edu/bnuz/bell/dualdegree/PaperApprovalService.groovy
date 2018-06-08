@@ -53,7 +53,7 @@ join form.approver approver
 left join form.paperApprover paperApprover
 where current_date between award.requestBegin and award.approvalEnd
 and form.status = :status 
-and (approver.id = :teacherId  or paperApprover.id = :teacherId )
+and paperApprover.id = :teacherId 
 order by form.datePaperSubmitted
 ''',[teacherId: teacherId, status: State.STEP4], args
     }
@@ -75,7 +75,7 @@ join form.student student
 join student.adminClass adminClass
 join form.approver approver
 left join form.paperApprover paperApprover
-where (approver.id = :teacherId or paperApprover.id = :teacherId)
+where paperApprover.id = :teacherId
 and form.datePaperApproved is not null
 and form.status <> :status
 order by form.datePaperApproved desc
@@ -91,7 +91,7 @@ join form.approver approver
 left join form.paperApprover paperApprover
 where current_date between award.requestBegin and award.approvalEnd
 and form.status = :status 
-and (approver.id = :teacherId  or paperApprover.id = :teacherId )
+and paperApprover.id = :teacherId
 ''', [teacherId: teacherId, status: State.STEP4]
     }
 
@@ -103,7 +103,7 @@ join form.approver approver
 left join form.paperApprover paperApprover
 where form.datePaperApproved is not null
 and form.status <> :status
-and (approver.id = :teacherId or paperApprover.id = :teacherId)
+and paperApprover.id = :teacherId
 ''', [teacherId: teacherId, status: State.STEP4]
     }
 
@@ -119,7 +119,7 @@ and (approver.id = :teacherId or paperApprover.id = :teacherId)
 
         def workitem = Workitem.findByInstanceAndActivityAndToAndDateProcessedIsNull(
                 WorkflowInstance.load(form.workflowInstanceId),
-                WorkflowActivity.load("${DegreeApplication.WORKFLOW_ID}.process"),
+                WorkflowActivity.load("${DegreeApplication.WORKFLOW_ID}.submitPaper"),
                 User.load(teacherId),
         )
         if (form.paperApproverId != teacherId && form.approverId != teacherId) {
@@ -182,7 +182,7 @@ join form.approver approver
 left join form.paperApprover paperApprover
 where current_date between award.requestBegin and award.approvalEnd
 and form.status = :status 
-and (approver.id = :teacherId  or paperApprover.id = :teacherId )
+and paperApprover.id = :teacherId
 and form.datePaperSubmitted < (select datePaperSubmitted from DegreeApplication where id = :id)
 order by form.datePaperSubmitted desc
 ''', [teacherId: teacherId, id: id, status: State.STEP4])
@@ -190,7 +190,7 @@ order by form.datePaperSubmitted desc
                 return dataAccessService.getLong('''
 select form.id
 from DegreeApplication form
-where (form.paperApprover.id = :teacherId or form.approver.id = :teacherId)
+where form.approver.id = :teacherId
 and form.datePaperApproved is not null
 and form.status <> :status
 and form.datePaperSubmitted < (select datePaperSubmitted from DegreeApplication where id = :id)
@@ -209,7 +209,7 @@ join form.approver approver
 left join form.paperApprover paperApprover
 where current_date between award.requestBegin and award.approvalEnd
 and form.status = :status 
-and (approver.id = :teacherId  or paperApprover.id = :teacherId )
+and paperApprover.id = :teacherId
 and form.datePaperSubmitted > (select datePaperSubmitted from DegreeApplication where id = :id)
 order by form.datePaperSubmitted asc
 ''', [teacherId: teacherId, id: id, status: State.STEP4])
@@ -217,7 +217,7 @@ order by form.datePaperSubmitted asc
                 return dataAccessService.getLong('''
 select form.id
 from DegreeApplication form
-where (form.paperApprover.id = :teacherId or form.approver.id = :teacherId)
+where form.paperApprover.id = :teacherId
 and form.datePaperApproved is not null
 and form.status <> :status
 and form.datePaperApproved > (select datePaperApproved from DegreeApplication where id = :id)
@@ -238,19 +238,19 @@ order by form.datePaperApproved asc
         }
         def workitem = Workitem.findByInstanceAndActivityAndToAndDateProcessedIsNull(
                 WorkflowInstance.load(form.workflowInstanceId),
-                WorkflowActivity.load("${DegreeApplication.WORKFLOW_ID}.review"),
+                WorkflowActivity.load("${DegreeApplication.WORKFLOW_ID}.checkPaper"),
                 User.load(paperApprover),
         )
         if (!workitem) {
             workitem = Workitem.findByInstanceAndActivityAndToAndDateProcessedIsNull(
                     WorkflowInstance.load(form.workflowInstanceId),
-                    WorkflowActivity.load("${DegreeApplication.WORKFLOW_ID}.finish"),
+                    WorkflowActivity.load("${DegreeApplication.WORKFLOW_ID}.approvePaper"),
                     User.load(paperApprover),
             )
         }
 
         if (form.award.betweenCheckDateRange()) {
-            domainStateMachineHandler.reject(form, paperApprover, 'finish', cmd.comment, workitem.id)
+            domainStateMachineHandler.reject(form, paperApprover, 'approvePaper', cmd.comment, workitem.id)
             form.datePaperApproved = new Date()
             form.save()
         }
@@ -273,13 +273,13 @@ order by form.datePaperApproved asc
 
         def workitem = Workitem.findByInstanceAndActivityAndToAndDateProcessedIsNull(
                 WorkflowInstance.load(form.workflowInstanceId),
-                WorkflowActivity.load('dualdegree.application.finish'),
+                WorkflowActivity.load('dualdegree.application.approvePaper'),
                 User.load(teacherId),
         )
         if (!workitem) {
             workitem = Workitem.findByInstanceAndActivityAndToAndDateProcessedIsNull(
                     WorkflowInstance.load(form.workflowInstanceId),
-                    WorkflowActivity.load('dualdegree.application.review'),
+                    WorkflowActivity.load('dualdegree.application.checkPaper'),
                     User.load(teacherId),
             )
         }
@@ -300,7 +300,7 @@ select new map(
 from DegreeApplication form
 join form.student student
 join form.award award
-where (form.paperApprover.id = :teacherId or form.approver.id = :teacherId) 
+where form.paperApprover.id = :teacherId
 and award.id = :awardId and form.status = :status
 ''',[teacherId: teacherId, awardId: awardId, status: State.STEP4]
     }

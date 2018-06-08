@@ -1,6 +1,8 @@
 package cn.edu.bnuz.bell.dualdegree
 
 import cn.edu.bnuz.bell.http.BadRequestException
+import cn.edu.bnuz.bell.http.ForbiddenException
+import cn.edu.bnuz.bell.http.NotFoundException
 import cn.edu.bnuz.bell.organization.Teacher
 import cn.edu.bnuz.bell.security.SecurityService
 import cn.edu.bnuz.bell.security.User
@@ -51,10 +53,12 @@ from DegreeApplication form
 join form.student student
 join student.adminClass adminClass
 join form.approver approver
+join form.award award
 left join form.paperApprover paperApprover
 where
 approver.id = :teacherId 
 and form.status = :status
+and current_date between award.requestBegin and award.approvalEnd
 order by form.datePaperSubmitted
 ''',[teacherId: teacherId, status: State.STEP3], args
     }
@@ -88,9 +92,11 @@ order by form.datePaperApproved desc
 select count(*)
 from DegreeApplication form 
 join form.approver approver
+join form.award award
 left join form.paperApprover paperApprover
 where approver.id = :teacherId 
 and form.status = :status
+and current_date between award.requestBegin and award.approvalEnd
 ''', [teacherId: teacherId, status: State.STEP3]
     }
 
@@ -118,7 +124,7 @@ and paperApprover.id is not null
 
         def workitem = Workitem.findByInstanceAndActivityAndToAndDateProcessedIsNull(
                 WorkflowInstance.load(form.workflowInstanceId),
-                WorkflowActivity.load("${DegreeApplication.WORKFLOW_ID}.review"),
+                WorkflowActivity.load("${DegreeApplication.WORKFLOW_ID}.checkPaper"),
                 User.load(teacherId),
         )
         if (form.approverId != teacherId) {
@@ -233,7 +239,7 @@ where d.id = :department
     void next(String userId, AcceptCommand cmd, UUID workitemId) {
         DegreeApplication form = DegreeApplication.get(cmd.id)
         if (form.award.betweenCheckDateRange()) {
-            domainStateMachineHandler.next(form, userId, 'finish', cmd.comment, workitemId, cmd.to)
+            domainStateMachineHandler.next(form, userId, 'approvePaper', cmd.comment, workitemId, cmd.to)
             form.paperApprover = Teacher.load(cmd.to)
             form.save()
         }
@@ -245,11 +251,11 @@ where d.id = :department
             if (form && form.award.betweenCheckDateRange()) {
                 def workitem = Workitem.findByInstanceAndActivityAndToAndDateProcessedIsNull(
                         WorkflowInstance.load(form.workflowInstanceId),
-                        WorkflowActivity.load("${DegreeApplication.WORKFLOW_ID}.review"),
+                        WorkflowActivity.load("${DegreeApplication.WORKFLOW_ID}.checkPaper"),
                         User.load(userId),
                 )
 
-                domainStateMachineHandler.next(form, userId, 'finish', null, workitem.id, cmd.teacherId)
+                domainStateMachineHandler.next(form, userId, 'approvePaper', null, workitem.id, cmd.teacherId)
                 form.paperApprover = Teacher.load(cmd.teacherId)
                 form.save()
             }
@@ -262,8 +268,36 @@ where d.id = :department
             throw new BadRequestException()
         }
         if (form.award.betweenCheckDateRange()) {
-            domainStateMachineHandler.reject(form, teacherId, 'review', cmd.comment, id)
+            domainStateMachineHandler.reject(form, teacherId, 'checkPaper', cmd.comment, id)
             form.paperApprover = null
+            form.save()
+        }
+    }
+
+    def finish(String teacherId, Long id) {
+        DegreeApplication form = DegreeApplication.get(id)
+
+        if (!form) {
+            throw new NotFoundException()
+        }
+
+        if (form.approver.id != teacherId && form.paperApprover.id != teacherId) {
+            throw new ForbiddenException()
+        }
+
+        if (!domainStateMachineHandler.canFinish(form)) {
+            throw new BadRequestException()
+        }
+
+        def workitem = Workitem.findByInstanceAndActivityAndToAndDateProcessedIsNull(
+                WorkflowInstance.load(form.workflowInstanceId),
+                WorkflowActivity.load('dualdegree.application.checkPaper'),
+                User.load(teacherId),
+        )
+
+        if (form.award.betweenCheckDateRange()) {
+            domainStateMachineHandler.finish(form, teacherId, workitem.id)
+            form.datePaperApproved = new Date()
             form.save()
         }
     }

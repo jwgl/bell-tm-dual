@@ -17,7 +17,7 @@ import cn.edu.bnuz.bell.workflow.commands.RejectCommand
 import grails.gorm.transactions.Transactional
 
 @Transactional
-class ApplicationApprovalService {
+class ApplicationCheckService {
     DataAccessService dataAccessService
     DomainStateMachineHandler domainStateMachineHandler
     ApplicationFormService applicationFormService
@@ -114,10 +114,10 @@ and form.approver.id = :teacherId
 
         def workitem = Workitem.findByInstanceAndActivityAndToAndDateProcessedIsNull(
                 WorkflowInstance.load(form.workflowInstanceId),
-                WorkflowActivity.load("${DegreeApplication.WORKFLOW_ID}.${Activities.APPROVE}"),
+                WorkflowActivity.load("${DegreeApplication.WORKFLOW_ID}.${Activities.CHECK}"),
                 User.load(teacherId),
         )
-        domainStateMachineHandler.checkReviewer(id, teacherId, Activities.APPROVE)
+        domainStateMachineHandler.checkReviewer(id, teacherId, Activities.CHECK)
 
         return [
                 form               : form,
@@ -200,7 +200,7 @@ order by form.dateApproved desc
     void next(String userId, AcceptCommand cmd, UUID workitemId) {
         DegreeApplication form = DegreeApplication.get(cmd.id)
         if (form.award.betweenCheckDateRange()) {
-            domainStateMachineHandler.next(form, userId, Activities.APPROVE, cmd.comment, workitemId, cmd.to)
+            domainStateMachineHandler.next(form, userId, Activities.CHECK, cmd.comment, workitemId, cmd.to)
             form.dateApproved = new Date()
             form.save()
         }
@@ -209,7 +209,7 @@ order by form.dateApproved desc
     void reject(String userId, RejectCommand cmd, UUID workitemId) {
         DegreeApplication form = DegreeApplication.get(cmd.id)
         if (form.award.betweenCheckDateRange()) {
-            domainStateMachineHandler.reject(form, userId, Activities.APPROVE, cmd.comment, workitemId)
+            domainStateMachineHandler.reject(form, userId, Activities.CHECK, cmd.comment, workitemId)
             form.dateApproved = new Date()
             form.save()
         }

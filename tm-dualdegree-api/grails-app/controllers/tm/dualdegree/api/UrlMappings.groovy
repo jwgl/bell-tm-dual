@@ -36,7 +36,7 @@ class UrlMappings {
 
         "/students"(resources: 'student', includes: []) {
             "/applications"(resources: 'applicationForm') {
-                "/approvers"(controller: 'applicationForm', action: 'approvers', method: 'GET')
+                "/checkers"(controller: 'applicationForm', action: 'checkers', method: 'GET')
                 "/papers"(resources: 'paperForm')
                 "/tousers"(controller: 'paperForm', action: 'tousers', method: 'GET')
                 "/workitems"(resources: 'paperForm', includes: ['show', 'patch'])
@@ -46,10 +46,10 @@ class UrlMappings {
             }
         }
 
-        "/approvers"(resources: 'approver', includes: []) {
-            "/applications"(resources: 'applicationApproval', includes: ['index', 'show', 'update']) {
-                "/tousers"(controller: 'applicationApproval', action: 'tousers', method: 'GET')
-                "/workitems"(resources: 'applicationApproval', includes: ['show', 'patch'])
+        "/checkers"(resources: 'checker', includes: []) {
+            "/applications"(resources: 'applicationCheck', includes: ['index', 'show', 'update']) {
+                "/tousers"(controller: 'applicationCheck', action: 'tousers', method: 'GET')
+                "/workitems"(resources: 'applicationCheck', includes: ['show', 'patch'])
                 collection {
                     "/mentors"(controller: 'mentor', action: 'index', method: 'GET')
                 }

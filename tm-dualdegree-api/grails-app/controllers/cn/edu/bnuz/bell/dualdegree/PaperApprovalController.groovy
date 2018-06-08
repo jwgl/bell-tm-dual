@@ -17,20 +17,20 @@ class PaperApprovalController {
     @Value('${bell.student.filesPath}')
     String filesPath
 
-    def index(String approverId, ListCommand cmd) {
-        renderJson(paperApprovalService.list(approverId, cmd))
+    def index(String mentorId, ListCommand cmd) {
+        renderJson(paperApprovalService.list(mentorId, cmd))
     }
 
-    def show(String approverId, Long paperApprovalId, String id, String type) {
+    def show(String mentorId, Long paperApprovalId, String id, String type) {
         ListType listType = ListType.valueOf(type ?: 'todo')
         if (id == 'undefined') {
-            renderJson paperApprovalService.getFormForReview(approverId, paperApprovalId, listType)
+            renderJson paperApprovalService.getFormForReview(mentorId, paperApprovalId, listType)
         } else {
-            renderJson paperApprovalService.getFormForReview(approverId, paperApprovalId, listType, UUID.fromString(id))
+            renderJson paperApprovalService.getFormForReview(mentorId, paperApprovalId, listType, UUID.fromString(id))
         }
     }
 
-    def patch(String approverId, Long id, String op) {
+    def patch(String mentorId, Long id, String op) {
         Long formId = id
         if (!formId) {
             formId = params.getLong("paperApprovalId")
@@ -38,30 +38,30 @@ class PaperApprovalController {
         def operation = Event.valueOf(op)
         switch (operation) {
             case Event.FINISH:
-                paperApprovalService.finish(approverId, id)
+                paperApprovalService.finish(mentorId, id)
                 break
             case Event.REJECT:
                 def cmd = new RejectCommand()
                 bindData(cmd, request.JSON)
                 cmd.id = formId
-                paperApprovalService.reject(approverId, cmd)
+                paperApprovalService.reject(mentorId, cmd)
                 break
             default:
                 throw new BadRequestException()
         }
 
-        renderJson paperApprovalService.getFormForReview(approverId, formId, ListType.TODO)
+        renderJson paperApprovalService.getFormForReview(mentorId, formId, ListType.TODO)
     }
 
     /**
      * 上传文件
      */
-    def upload(String approverId, Long paperApprovalId) {
+    def upload(String mentorId, Long paperApprovalId) {
         DegreeApplication form = DegreeApplication.get(paperApprovalId)
         if (!form) {
             throw new NotFoundException()
         }
-        if (form.approver.id != approverId && form.paperApprover.id != approverId) {
+        if (form.approver.id != mentorId && form.paperApprover.id != mentorId) {
             throw new ForbiddenException()
         }
         def prefix = params.prefix
@@ -95,8 +95,8 @@ class PaperApprovalController {
 
     }
 
-    def attachments(String approverId, Long awardId) {
-        def students = paperApprovalService.findUsers(approverId, awardId)
+    def attachments(String mentorId, Long awardId) {
+        def students = paperApprovalService.findUsers(mentorId, awardId)
         def basePath = "${filesPath}/${awardId}/"
         def zipTools = new ZipTools()
         response.setHeader("Content-disposition",

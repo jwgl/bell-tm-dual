@@ -9,17 +9,17 @@ import grails.gorm.transactions.Transactional
 class ApplicationReviewerService implements ReviewerProvider{
     List<Map> getReviewers(Object id, String activity) {
         switch (activity) {
-            case Activities.APPROVE:
-            case Activities.REVIEW:
-                return getApprovers(id as Long)
-            case 'finish':
+            case Activities.CHECK:
+            case 'checkPaper':
+                return getCheckers(id as Long)
+            case 'approvePaper':
                 return getPaperApprovers(id as Long)
             default:
                 throw new BadRequestException()
         }
     }
 
-    List<Map> getApprovers(Long id) {
+    List<Map> getCheckers(Long id) {
         DegreeApplication.executeQuery'''
 select new map(c.id as id, c.name as name)
 from DegreeApplication da 

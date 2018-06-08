@@ -7,7 +7,7 @@ class PaperMentorInterceptor {
     SecurityService securityService
 
     boolean before() {
-        if (params.approverId != securityService.userId) {
+        if (params.checkerId != securityService.userId) {
             render(status: HttpStatus.FORBIDDEN)
             return false
         } else {
