@@ -15,6 +15,6 @@ menuGroup 'main', {
         }
     }
     settings 90, {
-        dualDegreeUser      40, 'PERM_OBSERVER_ADMIN', '/web/dualdegree/settings/users'
+        dualDegreeUser      40, 'PERM_DUALDEGREE_ADMIN', '/web/dualdegree/settings/users'
     }
 }

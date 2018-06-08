@@ -10,7 +10,9 @@ class UrlMappings {
             }
         }
 
-        "/agreements"(resources: 'agreementPublic', includes: ['index', 'show'])
+        "/agreements"(resources: 'agreementPublic', includes: ['index', 'show']) {
+            "/getMajorOptionCn"(controller: 'agreementPublic', action: 'getMajorOptionCn', method: 'GET')
+        }
 
         group "/settings", {
             "/users"(resources: 'setting')

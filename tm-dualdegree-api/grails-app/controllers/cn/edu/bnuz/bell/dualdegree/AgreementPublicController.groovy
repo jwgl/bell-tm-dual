@@ -30,4 +30,11 @@ class AgreementPublicController {
         renderJson(agreements)
     }
 
+    /**
+     * 查看可衔接专业（中文）
+     */
+    def getMajorOptionCn(Long agreementPublicId, Integer majorId) {
+        renderJson(agreementService.getMajorOptionCn(agreementPublicId, majorId))
+    }
+
 }

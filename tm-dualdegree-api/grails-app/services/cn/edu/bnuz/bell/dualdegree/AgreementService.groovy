@@ -237,6 +237,7 @@ select new map(
     major.id            as id,
     item.agreement.id   as agreementId,
     item.majorOptions   as majorOptions,
+    item.majorOptionsCn as majorOptionsCn,
     major.grade         as grade,
     subject.name        as subjectName,
     department.id       as departmentId,
