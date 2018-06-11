@@ -32,7 +32,7 @@ join student.department department
 left join form.paperApprover paperApprover
 where department.name = :q or student.id = :q or student.name = :q
 order by form.dateSubmitted, student.id
-''',[q: q]
+''', [q: q]
     }
 
     def getFormForReview(Long id) {

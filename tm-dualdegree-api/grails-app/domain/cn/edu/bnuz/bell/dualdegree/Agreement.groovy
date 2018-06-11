@@ -7,7 +7,7 @@ class Agreement {
     /**
      * 协议名称
      */
-    String          name
+    String name
 
     /**
      * 项目分类 由前台定义好map
@@ -17,17 +17,17 @@ class Agreement {
     /**
      * 国外大学名称（英文）
      */
-    String          universityEn
+    String universityEn
 
     /**
      * 国外大学名称（中文）
      */
-    String          universityCn
+    String universityCn
 
     /**
      * 备注
      */
-    String          memo
+    String memo
 
     /**
      * 协议专业

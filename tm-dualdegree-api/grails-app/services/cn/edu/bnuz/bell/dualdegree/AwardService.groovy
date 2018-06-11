@@ -79,7 +79,7 @@ select new map(
 )
 from DepartmentAdministrator da join da.department d 
 where da.teacher.id = :userId
-''',[userId: securityService.userId]
+''', [userId: securityService.userId]
     }
 
     /**
@@ -101,7 +101,7 @@ select new map(
 )
 from Award award join award.department d
 where award.id = :id
-''',[id: id]
+''', [id: id]
         if(!results) {
             throw new NotFoundException()
         }

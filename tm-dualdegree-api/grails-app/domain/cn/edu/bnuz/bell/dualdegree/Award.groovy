@@ -9,15 +9,15 @@ import java.time.LocalDate
  * 双学位授予工作
  */
 class Award {
-    String      title
-    String      content
-    LocalDate   requestBegin
-    LocalDate   requestEnd
-    LocalDate   paperEnd
-    LocalDate   approvalEnd
-    Teacher     creator
-    Date        dateCreated
-    Department  department
+    String title
+    String content
+    LocalDate requestBegin
+    LocalDate requestEnd
+    LocalDate paperEnd
+    LocalDate approvalEnd
+    Teacher creator
+    Date dateCreated
+    Department department
 
     /**
      * 当前日期

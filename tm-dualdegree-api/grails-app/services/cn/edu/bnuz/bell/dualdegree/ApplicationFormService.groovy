@@ -59,7 +59,7 @@ and ba.department.id = :departmentId
         if (award && student) {
             if (!award.betweenApplyDateRange() ||
                 DegreeApplication.findByStudentAndAward(student, award)) {
-                //同一批每人只能一个申请， 超期禁止申请
+                // 同一批每人只能一个申请， 超期禁止申请
                 throw new ForbiddenException()
             }
         } else {
@@ -100,7 +100,7 @@ and ba.department.id = :departmentId
         DegreeApplication form = DegreeApplication.load(cmd.id)
         Award award = Award.get(cmd.awardId)
         if (form.award != award || form.student.id != userId) {
-            //无权更新
+            // 无权更新
             throw new ForbiddenException()
         }
         def now = new Date()
@@ -189,7 +189,7 @@ where form.id = :id
     Map getFormForCreate(String userId, Long awardId) {
         Award award = Award.get(awardId)
         Student student = Student.get(userId)
-        //15级是分水岭，以前的采用CooperativeUniversity，后面的采用协议中的合作大学
+        // 15级是分水岭，以前的采用CooperativeUniversity，后面的采用协议中的合作大学
         def universities
         if (student.major.grade <= 2015) {
             universities = getCooperativeUniversity(student.department.id)

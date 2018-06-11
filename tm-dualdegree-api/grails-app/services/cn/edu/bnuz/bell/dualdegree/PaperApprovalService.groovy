@@ -55,7 +55,7 @@ where current_date between award.requestBegin and award.approvalEnd
 and form.status = :status 
 and paperApprover.id = :teacherId 
 order by form.datePaperSubmitted
-''',[teacherId: teacherId, status: State.STEP4], args
+''', [teacherId: teacherId, status: State.STEP4], args
     }
 
     def findDoneList(String teacherId, Map args) {
@@ -79,7 +79,7 @@ where paperApprover.id = :teacherId
 and form.datePaperApproved is not null
 and form.status <> :status
 order by form.datePaperApproved desc
-''',[teacherId: teacherId, status: State.STEP4], args
+''', [teacherId: teacherId, status: State.STEP4], args
     }
 
     def countTodoList(String teacherId) {
@@ -302,6 +302,6 @@ join form.student student
 join form.award award
 where form.paperApprover.id = :teacherId
 and award.id = :awardId and form.status = :status
-''',[teacherId: teacherId, awardId: awardId, status: State.STEP4]
+''', [teacherId: teacherId, awardId: awardId, status: State.STEP4]
     }
 }

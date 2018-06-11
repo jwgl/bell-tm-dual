@@ -52,7 +52,7 @@ where form.approver.id = :teacherId
 and current_date between award.requestBegin and award.approvalEnd
 and form.status = :status
 order by form.dateSubmitted
-''',[teacherId: teacherId, status: State.STEP1], args
+''', [teacherId: teacherId, status: State.STEP1], args
 
         return [forms: forms, counts: getCounts(teacherId)]
     }
@@ -77,7 +77,7 @@ where form.approver.id = :teacherId
 and form.dateApproved is not null
 and form.status <> :status
 order by form.dateApproved desc
-''',[teacherId: teacherId, status: State.STEP1], args
+''', [teacherId: teacherId, status: State.STEP1], args
 
         return [forms: forms, counts: getCounts(teacherId)]
     }

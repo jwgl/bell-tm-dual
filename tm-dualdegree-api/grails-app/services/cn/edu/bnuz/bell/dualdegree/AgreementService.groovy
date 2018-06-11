@@ -70,7 +70,7 @@ order by agreement.name
                     dateCreated: new Date()
             ))
 
-//          添加到自助打印系统中
+            // 添加到自助打印系统中
             def majorRegionEto = new MajorRegionEto(majorId: item.id, region: form.region.name)
             def check = MajorRegionEto.get(majorRegionEto)
             if (!check) {
@@ -128,7 +128,7 @@ select new map(
 )
 from Agreement agreement join agreement.region gr
 where agreement.id = :id
-''',[id: id]
+''', [id: id]
         if (result) {
             def form = result[0]
             form['items'] = findAgreementMajors(id)
@@ -153,7 +153,7 @@ select new map(
 )
 from Agreement agreement join agreement.region gr
 where agreement.id = :id
-''',[id: id]
+''', [id: id]
         if (result) {
             def form = result[0]
             def items = findAgreementMajors(id)
@@ -212,7 +212,7 @@ where agreement.id = :id
                     ))
                 }
 
-//              添加到自助打印系统中
+                // 添加到自助打印系统中
                 def majorRegionEto = new MajorRegionEto(majorId: item.id, region: form.region.name)
                 def check = MajorRegionEto.get(majorRegionEto)
                 if (!check) {
@@ -246,7 +246,7 @@ select new map(
 from AgreementMajor item join item.major major join major.subject subject join major.department department
 where item.agreement.id = :id
 order by department.name, subject.name, major.grade, item.majorOptions
-''',[id: agreementId]
+''', [id: agreementId]
     }
 
     /**
@@ -260,8 +260,8 @@ select new map(
     major.grade                 as grade,
     subject.name                as subjectName,
     gr.name                     as regionName,
-    agreement.universityEn      as      universityEn,
-    agreement.universityCn      as      universityCn
+    agreement.universityEn      as universityEn,
+    agreement.universityCn      as universityCn
 )
 from AgreementMajor item join item.major major 
 join major.subject subject 
@@ -270,7 +270,7 @@ join item.agreement agreement
 join agreement.region gr
 where department.id = :id
 order by subject.name, gr.name, agreement.universityEn, major.grade, item.majorOptions
-''',[id: departmentId]
+''', [id: departmentId]
         List<GroupCondition> conditions = [
                 new GroupCondition(
                         groupBy: 'subjectName',

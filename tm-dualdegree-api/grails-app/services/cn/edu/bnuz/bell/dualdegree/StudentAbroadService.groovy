@@ -41,7 +41,7 @@ join st.major mj
 join mj.subject sj 
 join st.adminClass ac
 where d.id in (:departments) and sa.enabled is true
-''',[departments: studentValidateService.deptAdmins]
+''', [departments: studentValidateService.deptAdmins]
         return result.grep{
             (cmd.sujectId ? cmd.sujectId == it.subjectId : true) &&
             (cmd.grade ? cmd.grade == it.grade : true) &&
@@ -66,13 +66,14 @@ where d.id in (:departments) and sa.enabled is true
         StudentAbroad.executeUpdate'''
     insert into StudentAbroad (student, operator, dateCreated, agreementRegion, enabled)
     select st, :user, now(), :agreementRegion, true from Student st where st.id in (:ids) 
-''',[user: me, agreementRegion: region, ids: students]
-//      写入自助打印系统
+''', [user: me, agreementRegion: region, ids: students]
+
+        // 写入自助打印系统
         if (studentsEto && studentsEto.size()) {
             StudentAbroadEto.executeUpdate'''
     insert into StudentAbroadEto (studentId, studentName, dateCreated, creator, enabled, region)
     select st.id, st.name, now(), :userId, true, :agreementRegion from Student st where st.id in (:ids)
-''',[userId: me.id, agreementRegion: region.name, ids: studentsEto]
+''', [userId: me.id, agreementRegion: region.name, ids: studentsEto]
         }
         userLogService.log(securityService.userId,securityService.ipAddress,"CREATE", students.size(),"批量导入出国学生")
         return null
@@ -112,7 +113,7 @@ sj.name as name
 from Major mj join mj.subject sj
 where mj.department.id in (:departments) and sj.isDualDegree is true
 order by sj.name
-''',[departments: studentValidateService.deptAdmins]
+''', [departments: studentValidateService.deptAdmins]
     }
 
     def getGrades() {
@@ -121,6 +122,6 @@ select distinct mj.grade
 from Major mj join mj.subject sj
 where mj.department.id in (:departments) and sj.isDualDegree is true
 order by mj.grade
-''',[departments: studentValidateService.deptAdmins]
+''', [departments: studentValidateService.deptAdmins]
     }
 }
