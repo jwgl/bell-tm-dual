@@ -25,6 +25,7 @@ class AgreementMajor implements Serializable {
      * 协议
      */
     static belongsTo = [agreement: Agreement]
+    static hasMany = [coMajors: CooperativeMajor]
 
     Date dateCreated
 

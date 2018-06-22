@@ -1,9 +1,9 @@
 package cn.edu.bnuz.bell.dualdegree
 
 /**
- * 国外大学
+ * 国外专业
  */
-class CooperativeUniversity {
+class CooperativeMajor {
     /**
      * 英文名缩写
      */
@@ -17,19 +17,23 @@ class CooperativeUniversity {
      */
     String nameEn
     /**
-     * 项目分类
+     * 学位（英文）
      */
-    AgreementRegion region
+    String bachelor
 
-    static hasMany = [cooperativeMajors: CooperativeMajor]
+    static belongsTo = [university: CooperativeUniversity]
 
     static mapping = {
         comment                 '国外大学'
         table                   schema: 'tm_dual'
         id                      generator: 'identity', comment: '流水号'
-        shortName               length: 10, comment: '英文名缩写'
+        shortName               length: 5, comment: '英文名缩写'
         nameEn                  length: 100, comment: '英文名称'
         nameCn                  length: 100, comment: '中文名称'
-        region                  comment: '项目分类'
+        bachelor                length: 50, comment: '所获得学位'
+    }
+
+    static constraints = {
+        bachelor    nullable: true
     }
 }

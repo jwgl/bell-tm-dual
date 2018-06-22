@@ -110,7 +110,7 @@ select distinct new map(
 sj.id as id,
 sj.name as name
 )
-from Major mj join mj.subject sj
+from CooperativeMajor mj join mj.subject sj
 where mj.department.id in (:departments) and sj.isDualDegree is true
 order by sj.name
 ''', [departments: studentValidateService.deptAdmins]
@@ -119,7 +119,7 @@ order by sj.name
     def getGrades() {
         Major.executeQuery'''
 select distinct mj.grade
-from Major mj join mj.subject sj
+from CooperativeMajor mj join mj.subject sj
 where mj.department.id in (:departments) and sj.isDualDegree is true
 order by mj.grade
 ''', [departments: studentValidateService.deptAdmins]

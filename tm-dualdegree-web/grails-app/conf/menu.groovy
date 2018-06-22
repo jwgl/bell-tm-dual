@@ -8,6 +8,7 @@ menuGroup 'main', {
         award               15, 'PERM_DUALDEGREE_DEPT_ADMIN', '/web/dualdegree/departments/${departmentId}/awards'
         apply               16, 'PERM_DUALDEGREE_WRITE', '/web/dualdegree/students/${userId}/applications'
         agreements          17, 'PERM_DUALDEGREE_AGREEMENT_READ', '/web/dualdegree/agreements'
+        universityAdmin     18, 'PERM_DUALDEGREE_ADMIN', '/web/dualdegree/users/${userId}/universities'
         approval            70, {
             applicationCheck    71, 'PERM_DUALDEGREE_DEPT_ADMIN', '/web/dualdegree/checkers/${userId}/applications'
             paperMentor         72, 'PERM_DUALDEGREE_DEPT_ADMIN', '/web/dualdegree/checkers/${userId}/papers'

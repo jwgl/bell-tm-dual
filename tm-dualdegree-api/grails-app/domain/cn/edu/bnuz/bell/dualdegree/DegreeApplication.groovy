@@ -49,6 +49,11 @@ class DegreeApplication implements StateObject {
     String majorCooperative
 
     /**
+     * 获得学位年份
+     */
+    String bachelorYear
+
+    /**
      * 创建日期
      */
     LocalDate dateCreated
@@ -126,6 +131,7 @@ class DegreeApplication implements StateObject {
         dateApproved                     comment: '材料审批时间'
         workflowInstance                 comment: '工作流实例'
         paperForm                        comment: '论文互认表'
+        bachelorYear                     length: 4, comment: '获得学位年份'
     }
     static constraints = {
         dateSubmitted           nullable: true
@@ -136,6 +142,7 @@ class DegreeApplication implements StateObject {
         dateApproved            nullable: true
         workflowInstance        nullable: true
         paperForm               nullable: true
+        bachelorYear            nullable: true
     }
 
     String getWorkflowId() {

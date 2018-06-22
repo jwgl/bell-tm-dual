@@ -34,6 +34,11 @@ class Agreement {
      */
     static hasMany = [item: AgreementMajor]
 
+    /**
+     * 合作大学
+     */
+    CooperativeUniversity university
+
     static mapping = {
         comment                 '协议'
         table                   schema: 'tm_dual'
@@ -43,9 +48,11 @@ class Agreement {
         region                  comment: '协议按地区分类'
         universityEn            length: 200, comment: '国外大学英文名'
         universityCn            length: 100, comment: '国外大学英文名'
+        university              comment: '合作大学'
     }
 
     static constraints = {
         memo         nullable: true
+        university   nullable: true
     }
 }

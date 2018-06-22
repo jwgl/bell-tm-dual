@@ -189,7 +189,7 @@ where form.id = :id
     Map getFormForCreate(String userId, Long awardId) {
         Award award = Award.get(awardId)
         Student student = Student.get(userId)
-        // 15级是分水岭，以前的采用CooperativeUniversity，后面的采用协议中的合作大学
+        // 15级是分水岭，以前的采用CoUniversity，后面的采用协议中的合作大学
         def universities
         if (student.major.grade <= 2015) {
             universities = getCooperativeUniversity(student.department.id)
@@ -241,9 +241,9 @@ where form.id = :id
     }
 
     private List<String> getCooperativeUniversity(String departmentId) {
-        CooperativeUniversity.executeQuery'''
+        CoUniversity.executeQuery'''
 select new map(c.name as universityEn)
-from CooperativeUniversity c
+from CoUniversity c
 where c.department.id = :departmentId
 ''', [departmentId: departmentId]
     }

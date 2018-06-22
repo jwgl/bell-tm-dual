@@ -6,6 +6,7 @@ class UrlMappings {
 
         "/users"(resources: 'user', includes: []) {
             "/agreements"(resources: 'agreementForm', includes: ['index'])
+            "/universities"(resources: 'CooperativeUniversity', includes: ['index'])
         }
 
         "/agreements"(resources: 'agreementPublic', includes: ['index'])

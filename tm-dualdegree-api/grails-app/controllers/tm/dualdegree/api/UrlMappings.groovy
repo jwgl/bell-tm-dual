@@ -8,6 +8,7 @@ class UrlMappings {
             "/agreements"(resources: 'agreement') {
                 "/getMajorOptionCn"(controller: 'agreement', action: 'getMajorOptionCn', method: 'GET')
             }
+            "/universities"(resources: 'cooperativeUniversity')
         }
 
         "/agreements"(resources: 'agreementPublic', includes: ['index', 'show']) {
