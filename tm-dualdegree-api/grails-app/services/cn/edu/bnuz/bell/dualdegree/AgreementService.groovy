@@ -23,11 +23,12 @@ select distinct new map(
     agreement.id                as      id,
     agreement.name              as      name,
     gr.name                     as      regionName,
-    agreement.universityEn      as      universityEn,
-    agreement.universityCn      as      universityCn,
+    u.nameEn                    as      universityEn,
+    u.nameCn                    as      universityCn,
     agreement.memo              as      memo
 )
-from Agreement agreement join agreement.region gr
+from Agreement agreement join agreement.university u
+join u.region gr
 join agreement.item item
 join item.major major
 join major.department department
@@ -37,7 +38,7 @@ and gr.name like :regionName
 and department.name like :departmentName
 and subject.name like :subjectName
 and major.grade = :grade
-and agreement.universityCn like :universityCn
+and u.nameCn like :universityCn
 order by agreement.name
 '''
         if (!cmd.grade) queryStr = queryStr.replace('major.grade', ':grade')
@@ -57,24 +58,25 @@ order by agreement.name
     def create(AgreementCommand cmd) {
         Agreement form = new Agreement(
                 name:               cmd.agreementName,
-                region:             AgreementRegion.load(cmd.regionId),
-                universityCn:       cmd.universityCn,
-                universityEn:       cmd.universityEn,
+                university:         CooperativeUniversity.load(cmd.universityId),
                 memo:               cmd.memo
         )
         cmd.addedItems.each { item ->
-            form.addToItem(new AgreementMajor(
+            def agreementMajor = new AgreementMajor(
                     major: Major.load(item.id),
-                    majorOptions: item.majorOptions,
-                    majorOptionsCn: item.majorOptionsCn,
                     dateCreated: new Date()
-            ))
+            )
+            item.coMajors.each { id ->
+                println id
+                agreementMajor.addToCoMajors(CooperativeMajor.load(id))
+            }
+            form.addToItem(agreementMajor)
 
             // 添加到自助打印系统中
-            def majorRegionEto = new MajorRegionEto(majorId: item.id, region: form.region.name)
+            def majorRegionEto = new MajorRegionEto(majorId: item.id, region: form.university.region.name)
             def check = MajorRegionEto.get(majorRegionEto)
             if (!check) {
-                majorRegionEto.save()
+//                majorRegionEto.save()
             }
         }
         form.save()
@@ -206,8 +208,6 @@ where agreement.id = :id
                 if (!agreementItem) {
                     form.addToItem(new AgreementMajor(
                             major: major,
-                            majorOptions: item.majorOptions,
-                            majorOptionsCn: item.majorOptionsCn,
                             dateCreated: new Date()
                     ))
                 }
@@ -216,7 +216,7 @@ where agreement.id = :id
                 def majorRegionEto = new MajorRegionEto(majorId: item.id, region: form.region.name)
                 def check = MajorRegionEto.get(majorRegionEto)
                 if (!check) {
-                    majorRegionEto.save()
+//                    majorRegionEto.save()
                 }
             }
 
@@ -297,12 +297,19 @@ order by subject.name, gr.name, agreement.universityEn, major.grade, item.majorO
         return CollectionUtils.groupBy(list, conditions)
     }
 
-    def getMajorOptionCn(agreementId, majorId) {
-        def result = AgreementMajor.executeQuery '''
-select new map(ag.majorOptionsCn as majorOptionsCn)
-from AgreementMajor ag
-where ag.agreement.id = :agreementId and ag.major.id = :majorId 
-''', [agreementId: agreementId, majorId: majorId]
-        return result ? result[0] : []
+    /**
+     * 合作大学
+     */
+    def getUniversities() {
+        CooperativeUniversity.executeQuery '''
+select new map(
+    c.id as id,
+    c.nameEn as nameEn,
+    c.shortName as shortName,
+    c.nameCn as nameCn,
+    r.name as region
+)
+from CooperativeUniversity c join c.region r
+'''
     }
 }

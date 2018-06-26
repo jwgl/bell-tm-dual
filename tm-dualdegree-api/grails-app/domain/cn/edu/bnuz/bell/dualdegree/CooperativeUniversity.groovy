@@ -32,4 +32,8 @@ class CooperativeUniversity {
         nameCn                  length: 100, comment: '中文名称'
         region                  comment: '项目分类'
     }
+
+    static constraints = {
+        nameEn  unique: true
+    }
 }

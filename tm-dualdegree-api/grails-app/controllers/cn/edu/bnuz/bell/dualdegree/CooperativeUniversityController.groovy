@@ -15,6 +15,16 @@ class CooperativeUniversityController {
     }
 
     /**
+     * 编辑数据
+     */
+    def edit(Long id) {
+        renderJson([
+                form: cooperativeUniversityService.getFormForEdit(id),
+                regions: cooperativeUniversityService.regions
+        ])
+    }
+
+    /**
      * 保存数据
      */
     def save() {
@@ -28,10 +38,10 @@ class CooperativeUniversityController {
      * 更新数据
      */
     def update(Long id) {
-        def cmd = new AgreementCommand()
+        def cmd = new CooperativeUniversityCommand()
         bindData(cmd, request.JSON)
         cmd.id = id
-        // cooperativeUniversityService.update(cmd)
+        cooperativeUniversityService.update(cmd)
         renderOk()
     }
 

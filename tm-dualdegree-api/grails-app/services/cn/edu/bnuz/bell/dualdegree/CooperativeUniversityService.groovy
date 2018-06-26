@@ -1,6 +1,5 @@
 package cn.edu.bnuz.bell.dualdegree
 
-import cn.edu.bnuz.bell.http.ForbiddenException
 import cn.edu.bnuz.bell.utils.CollectionUtils
 import cn.edu.bnuz.bell.utils.GroupCondition
 import grails.gorm.transactions.Transactional
@@ -44,9 +43,6 @@ order by rg.name,cu.nameEn
      * 保存合作大学
      */
     def create(CooperativeUniversityCommand cmd) {
-        if (CooperativeUniversity.load(cmd)) {
-            throw new ForbiddenException()
-        }
         CooperativeUniversity form = new CooperativeUniversity(
                 nameEn:             cmd.nameEn,
                 shortName:          cmd.shortName.length() > 10 ? getShortName(cmd.nameEn) : cmd.shortName,
@@ -63,6 +59,33 @@ order by rg.name,cu.nameEn
         }
         form.save()
         return form
+    }
+
+    /**
+     * 更新合作大学
+     */
+    def update(CooperativeUniversityCommand cmd) {
+        CooperativeUniversity form = CooperativeUniversity.load(cmd.id)
+        if (form) {
+            form.nameEn = cmd.nameEn
+            form.shortName = cmd.shortName
+            form.region = AgreementRegion.load(cmd.regionId)
+            form.nameCn = cmd.nameCn
+
+            cmd.addedItems.each { item ->
+                def cooperativeMajor = CooperativeMajor.findByUniversityAndNameEn(form, item.nameEn)
+                if (!cooperativeMajor) {
+                    form.addToCooperativeMajors(new CooperativeMajor(
+                            shortName: getShortName(item.nameEn),
+                            nameEn: item.nameEn,
+                            nameCn: item.nameCn,
+                            bachelor: item.bachelor
+                    ))
+                }
+            }
+            form.save(flush: true)
+            return form
+        }
     }
 
     /**
@@ -84,11 +107,11 @@ from AgreementRegion gr
     def getFormForEdit(Long id) {
         def result = CooperativeUniversity.executeQuery'''
 select new map(
-    cu.id as cuId,
-    cu.shortName as universityShortName,
-    cu.nameCn as universityCn,
-    cu.nameEn as universityEn,
-    rg.name as region
+    cu.id as id,
+    cu.shortName as shortName,
+    cu.nameCn as nameCn,
+    cu.nameEn as nameEn,
+    rg.id as regionId
 )
 from CooperativeUniversity cu join cu.region rg 
 where cu.id = :id
@@ -105,6 +128,7 @@ where cu.id = :id
     def findCooperativeMajors(Long id) {
         CooperativeMajor.executeQuery'''
 select new map(
+    item.id               as id,
     item.nameEn           as nameEn,
     item.shortName        as shortName,
     item.nameCn           as nameCn,
@@ -120,17 +144,16 @@ order by item.bachelor, item.nameEn
      * 浏览
      */
     def getFormForShow(Long id) {
-        def result = Agreement.executeQuery '''
+        def result = CooperativeUniversity.executeQuery '''
 select new map(
-    agreement.id                as      id,
-    agreement.name              as      agreementName,
-    gr.name                     as      regionName,
-    agreement.universityEn      as      universityEn,
-    agreement.universityCn      as      universityCn,
-    agreement.memo              as      memo
+    cu.id as id,
+    cu.shortName as shortName,
+    cu.nameCn as nameCn,
+    cu.nameEn as nameEn,
+    rg.name as region
 )
-from Agreement agreement join agreement.region gr
-where agreement.id = :id
+from CooperativeUniversity cu join cu.region rg 
+where cu.id = :id
 ''', [id: id]
         if (result) {
             def form = result[0]
@@ -158,5 +181,6 @@ where agreement.id = :id
         } else {
             shortName = nameEn.trim()
         }
+        return shortName
     }
 }

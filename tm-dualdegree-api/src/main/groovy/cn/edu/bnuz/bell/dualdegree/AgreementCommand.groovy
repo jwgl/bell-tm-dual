@@ -5,9 +5,7 @@ class AgreementCommand {
 
     Long          id
     String        agreementName
-    Integer       regionId
-    String        universityEn
-    String        universityCn
+    Integer       universityId
     String        memo
 
     List<Item>      addedItems
@@ -18,8 +16,7 @@ class AgreementCommand {
          * 年级专业
          */
         Integer id
-        String majorOptions
-        String majorOptionsCn
+        List<Integer>   coMajors
     }
 
 }

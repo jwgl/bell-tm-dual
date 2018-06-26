@@ -8,6 +8,7 @@ import org.springframework.security.access.prepost.PreAuthorize
 @PreAuthorize('hasAuthority("PERM_DUALDEGREE_AGREEMENT_WRITE")')
 class AgreementController {
 	AgreementService agreementService
+    CooperativeUniversityService cooperativeUniversityService
 
     def index() {
         def cmd = new AgreementFilterCommand()
@@ -59,14 +60,15 @@ class AgreementController {
                         items: [],
                 ],
                 regions: agreementService.regions,
-                majors: agreementService.majors
+                majors: agreementService.majors,
+                universities: agreementService.universities
         ])
     }
 
     /**
-     * 查看可衔接专业（中文）
+     * 可衔接专业
      */
-    def getMajorOptionCn(Long agreementId, Integer majorId) {
-        renderJson(agreementService.getMajorOptionCn(agreementId, majorId))
+    def findCooperativeMajors(Long agreementId, Integer universityId) {
+        renderJson(cooperativeUniversityService.findCooperativeMajors(universityId))
     }
 }

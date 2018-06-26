@@ -6,7 +6,9 @@ class UrlMappings {
 
         "/users"(resources: 'user', includes:[]){
             "/agreements"(resources: 'agreement') {
-                "/getMajorOptionCn"(controller: 'agreement', action: 'getMajorOptionCn', method: 'GET')
+                collection {
+                    "/cooperativeMajors"(controller: 'agreement', action: 'findCooperativeMajors', method: 'GET')
+                }
             }
             "/universities"(resources: 'cooperativeUniversity')
         }
