@@ -13,9 +13,11 @@ class AgreementCommand {
 
     class Item {
         /**
-         * 年级专业
+         * 校内专业
          */
         Integer id
+        Integer startedGrade
+        Integer endedGrade
         List<Integer>   coMajors
     }
 

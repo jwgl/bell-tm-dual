@@ -22,8 +22,8 @@ class AgreementController {
     def edit(Long id) {
         renderJson([
                 form: agreementService.getFormForEdit(id),
-                regions: agreementService.regions,
-                majors: agreementService.majors])
+                majors: agreementService.subjects,
+                universities: agreementService.universities])
     }
 
     def show(Long id) {
@@ -59,8 +59,7 @@ class AgreementController {
                 form: [
                         items: [],
                 ],
-                regions: agreementService.regions,
-                majors: agreementService.majors,
+                majors: agreementService.subjects,
                 universities: agreementService.universities
         ])
     }

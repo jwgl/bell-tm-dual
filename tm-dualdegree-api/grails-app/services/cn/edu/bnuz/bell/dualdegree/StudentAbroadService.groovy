@@ -37,7 +37,7 @@ from StudentAbroad sa
 join sa.student st 
 join sa.agreementRegion g
 join st.department d 
-join st.major mj 
+join st.subject mj 
 join mj.subject sj 
 join st.adminClass ac
 where d.id in (:departments) and sa.enabled is true

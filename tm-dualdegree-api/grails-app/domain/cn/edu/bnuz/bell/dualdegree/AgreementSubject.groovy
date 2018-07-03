@@ -1,20 +1,31 @@
 package cn.edu.bnuz.bell.dualdegree
 
-import cn.edu.bnuz.bell.master.Major
-import org.codehaus.groovy.util.HashCodeHelper
+import cn.edu.bnuz.bell.master.Subject
 
 /**
  *协议专业
  */
-class AgreementMajor implements Serializable {
+class AgreementSubject {
     /**
-     * 年级专业
+     * 校内专业
      */
-    Major major
+    Subject subject
+
+    /**
+     * 起始年级：只做一个门槛，允许比startedGrade低1级的学生选该协议
+     */
+    Integer startedGrade
+
+    /**
+     * 截至年级
+     */
+    Integer endedGrade
 
     /**
      * 协议
      */
+    Agreement agreement
+
     static belongsTo = [agreement: Agreement]
     static hasMany = [items: AgreementCooperativeMajor]
 
@@ -24,12 +35,12 @@ class AgreementMajor implements Serializable {
         comment                 '协议适用年级专业'
         table                   schema: 'tm_dual'
         id                      generator: 'identity', comment: '协议专业ID'
-        major                   comment: '年级专业'
+        subject                 comment: '年级专业'
         agreement               comment: '协议'
     }
 
     static constraints = {
         dateCreated nullable: true
-        major       unique: 'agreement'
+        subject       unique: 'agreement'
     }
 }

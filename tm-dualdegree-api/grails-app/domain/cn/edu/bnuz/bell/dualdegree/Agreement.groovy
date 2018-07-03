@@ -17,7 +17,7 @@ class Agreement {
     /**
      * 协议专业
      */
-    static hasMany = [item: AgreementMajor]
+    static hasMany = [item: AgreementSubject]
 
     /**
      * 合作大学

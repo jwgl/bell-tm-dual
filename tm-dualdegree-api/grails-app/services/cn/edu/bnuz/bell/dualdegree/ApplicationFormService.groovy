@@ -249,16 +249,16 @@ where c.department.id = :departmentId
     }
 
     private List<Map<String, String>> getCooperativeUniversity(Student student) {
-        AgreementMajor.executeQuery'''
+        AgreementSubject.executeQuery'''
 select new map(
     ag.universityEn as universityEn,
     ag.universityCn as universityCn
 )
-from AgreementMajor agmj 
+from AgreementSubject agmj 
 join agmj.agreement ag
 join ag.region agRegion,
 StudentAbroad sa join sa.agreementRegion saRegion join sa.student student
-where agRegion = saRegion and student.id = :studentId and student.major = agmj.major
+where agRegion = saRegion and student.id = :studentId and student.subject = agmj.subject
 ''', [studentId: student.id]
     }
 

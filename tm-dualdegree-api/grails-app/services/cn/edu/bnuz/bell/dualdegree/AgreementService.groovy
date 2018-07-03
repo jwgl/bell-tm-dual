@@ -1,13 +1,16 @@
 package cn.edu.bnuz.bell.dualdegree
 
+import cn.edu.bnuz.bell.dualdegree.dv.DvAgreementMajorsView
 import cn.edu.bnuz.bell.dualdegree.eto.MajorRegionEto
-import cn.edu.bnuz.bell.master.Major
+import cn.edu.bnuz.bell.http.BadRequestException
+import cn.edu.bnuz.bell.master.Subject
 import cn.edu.bnuz.bell.security.SecurityService
 import cn.edu.bnuz.bell.security.UserLogService
 import cn.edu.bnuz.bell.utils.CollectionUtils
 import cn.edu.bnuz.bell.utils.GroupCondition
 import grails.converters.JSON
 import grails.gorm.transactions.Transactional
+
 
 @Transactional
 class AgreementService {
@@ -30,18 +33,17 @@ select distinct new map(
 from Agreement agreement join agreement.university u
 join u.region gr
 join agreement.item item
-join item.major major
-join major.department department
-join major.subject subject
+join item.subject subject
+join subject.department department
 where agreement.name like :name
 and gr.name like :regionName
 and department.name like :departmentName
 and subject.name like :subjectName
-and major.grade = :grade
+and :grade between item.startedGrade and item.endedGrade
 and u.nameCn like :universityCn
 order by agreement.name
 '''
-        if (!cmd.grade) queryStr = queryStr.replace('major.grade', ':grade')
+        if (!cmd.grade) queryStr = queryStr.replace('between item.startedGrade and item.endedGrade', '= 1')
         def results = Agreement.executeQuery queryStr,
                 [name: cmd.name ? "%${cmd.name}%" : '%',
                  regionName: cmd.regionName ?: '%',
@@ -49,7 +51,7 @@ order by agreement.name
                  grade: cmd.grade ?: 1,
                  subjectName: cmd.subjectName ?: '%',
                  universityCn: cmd.universityCn ? "%${cmd.name}%" : '%']
-        return [list: results, majors: this.majors, regions: this.regions]
+        return [list: results, majors: this.subjects, regions: this.regions]
     }
 
     /**
@@ -62,24 +64,26 @@ order by agreement.name
                 memo:               cmd.memo
         )
         cmd.addedItems.each { item ->
-            def agreementMajor = new AgreementMajor(
-                    major: Major.load(item.id),
+            def agreementMajor = new AgreementSubject(
+                    subject: Subject.load(item.id),
+                    startedGrade: item.startedGrade,
+                    endedGrade: item.endedGrade,
                     dateCreated: new Date()
             )
             item.coMajors.each { id ->
-                println id
-                agreementMajor.addToCoMajors(CooperativeMajor.load(id))
+                agreementMajor.addToItems(new AgreementCooperativeMajor(
+                        cooperativeMajor: CooperativeMajor.load(id)
+                ))
             }
             form.addToItem(agreementMajor)
-
-            // 添加到自助打印系统中
-            def majorRegionEto = new MajorRegionEto(majorId: item.id, region: form.university.region.name)
-            def check = MajorRegionEto.get(majorRegionEto)
-            if (!check) {
+            // 添加到自助打印系统中，改到执行时才推送
+//            def majorRegionEto = new MajorRegionEto(majorId: item.id, region: form.university.region.name)
+//            def check = MajorRegionEto.get(majorRegionEto)
+//            if (!check) {
 //                majorRegionEto.save()
-            }
+//            }
         }
-        form.save()
+        form.save(flush: true)
         return form
     }
 
@@ -97,21 +101,20 @@ from AgreementRegion gr
     }
 
     /**
-     * 2+2年级专业列表
+     * 2+2专业列表
      */
-    def getMajors() {
-        Major.executeQuery'''
+    def getSubjects() {
+        Subject.executeQuery'''
 select new map(
-    major.id        as id,
-    major.grade     as grade,
+    subject.id      as id,
     subject.name    as subjectName,
     department.id   as departmentId,
     department.enabled as enabled,
     department.name as departmentName    
 )
-from Major major join major.subject subject join major.department department
+from Subject subject join subject.department department
 where subject.isDualDegree is true
-order by department.name, subject.name, major.grade
+order by department.name, subject.name
 '''
     }
 
@@ -119,25 +122,26 @@ order by department.name, subject.name, major.grade
      * 编辑
      */
     def getFormForEdit(Long id) {
-        def result = Agreement.executeQuery '''
-select new map(
-    agreement.id                as      id,
-    agreement.name              as      agreementName,
-    gr.id                       as      regionId,
-    agreement.universityEn      as      universityEn,
-    agreement.universityCn      as      universityCn,
-    agreement.memo              as      memo
-)
-from Agreement agreement join agreement.region gr
-where agreement.id = :id
-''', [id: id]
-        if (result) {
-            def form = result[0]
-            form['items'] = findAgreementMajors(id)
-            return form
-        } else {
-            return []
+        Agreement form = Agreement.get(id)
+        if (!form) {
+            throw new BadRequestException()
         }
+        def items = findAgreementMajors(id)
+        items.each { item ->
+            item['coMajors'] = findCoMajors(item.id as Long)
+        }
+        return [
+                id: form.id,
+                agreementName: form.name,
+                memo: form.memo,
+                items: items,
+                university: [
+                        id: form.university.id,
+                        nameCn: form.university.nameCn,
+                        region: form.university.region.name,
+                        nameEn: form.university.nameEn
+                ]
+        ]
     }
 
     /**
@@ -149,11 +153,12 @@ select new map(
     agreement.id                as      id,
     agreement.name              as      agreementName,
     gr.name                     as      regionName,
-    agreement.universityEn      as      universityEn,
-    agreement.universityCn      as      universityCn,
+    u.nameEn                    as      universityEn,
+    u.nameCn                    as      universityCn,
     agreement.memo              as      memo
 )
-from Agreement agreement join agreement.region gr
+from Agreement agreement join agreement.university u
+join u.region gr
 where agreement.id = :id
 ''', [id: id]
         if (result) {
@@ -197,17 +202,15 @@ where agreement.id = :id
         Agreement form = Agreement.load(cmd.id)
         if (form) {
             form.name = cmd.agreementName
-            form.universityCn = cmd.universityCn
-            form.universityEn = cmd.universityEn
-            form.region = AgreementRegion.load(cmd.regionId)
+            form.university = CooperativeUniversity.load(cmd.universityId)
             form.memo = cmd.memo
 
             cmd.addedItems.each { item ->
                 def major = Major.load(item.id)
-                def agreementItem = AgreementMajor.get(new AgreementMajor(agreement: form, major: major))
+                def agreementItem = AgreementSubject.get(new AgreementSubject(agreement: form, subject: major))
                 if (!agreementItem) {
-                    form.addToItem(new AgreementMajor(
-                            major: major,
+                    form.addToItem(new AgreementSubject(
+                            subject: major,
                             dateCreated: new Date()
                     ))
                 }
@@ -221,7 +224,7 @@ where agreement.id = :id
             }
 
             cmd.removedItems.each {
-                def agreementItem = AgreementMajor.load(new AgreementMajor(agreement: form, major: Major.load(it)))
+                def agreementItem = AgreementSubject.load(new AgreementSubject(agreement: form, subject: Major.load(it)))
                 userLogService.log(securityService.userId,securityService.ipAddress,"DELETE", agreementItem,"${agreementItem as JSON}")
                 form.removeFromItem(agreementItem)
                 agreementItem.delete()
@@ -232,44 +235,60 @@ where agreement.id = :id
     }
 
     private findAgreementMajors(Long agreementId) {
-        AgreementMajor.executeQuery'''
+        DvAgreementMajorsView.executeQuery'''
 select new map(
-    major.id            as id,
-    item.agreement.id   as agreementId,
-    item.majorOptions   as majorOptions,
-    item.majorOptionsCn as majorOptionsCn,
-    major.grade         as grade,
-    subject.name        as subjectName,
-    department.id       as departmentId,
-    department.name     as departmentName
+    amv.id               as id,
+    amv.agreementId      as agreementId,
+    subject.grade          as grade,
+    subject.name         as subjectName,
+    department.id        as departmentId,
+    department.name      as departmentName,
+    amv.majorOptions     as majorOptions
 )
-from AgreementMajor item join item.major major join major.subject subject join major.department department
-where item.agreement.id = :id
-order by department.name, subject.name, major.grade, item.majorOptions
+from DvAgreementMajorsView amv ,AgreementSubject am 
+join am.subject subject 
+join subject.subject subject 
+join subject.department department
+where amv.agreementId = :id and am.id=amv.id
+order by department.name, subject.name, subject.grade
 ''', [id: agreementId]
+    }
+
+    private findCoMajors(Long itemId) {
+        AgreementCooperativeMajor.executeQuery'''
+select new map(
+    cm.id           as id,
+    cm.nameEn       as nameEn,
+    cm.nameCn       as nameCn,
+    cm.bachelor     as bachelor    
+)
+from AgreementCooperativeMajor acm 
+join acm.cooperativeMajor cm
+where acm.agreementMajor.id = :id
+''', [id: itemId]
     }
 
     /**
      * 特定学院相关协议
      */
     def findAgreementsByDepartment(String departmentId) {
-        def list = AgreementMajor.executeQuery'''
+        def list = AgreementSubject.executeQuery'''
 select new map(
-    major.id                    as id,
+    subject.id                    as id,
     item.majorOptions           as majorOptions,
-    major.grade                 as grade,
+    subject.grade                 as grade,
     subject.name                as subjectName,
     gr.name                     as regionName,
     agreement.universityEn      as universityEn,
     agreement.universityCn      as universityCn
 )
-from AgreementMajor item join item.major major 
-join major.subject subject 
-join major.department department
+from AgreementSubject item join item.subject subject 
+join subject.subject subject 
+join subject.department department
 join item.agreement agreement
 join agreement.region gr
 where department.id = :id
-order by subject.name, gr.name, agreement.universityEn, major.grade, item.majorOptions
+order by subject.name, gr.name, agreement.universityEn, subject.grade, item.majorOptions
 ''', [id: departmentId]
         List<GroupCondition> conditions = [
                 new GroupCondition(

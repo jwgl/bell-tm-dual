@@ -56,7 +56,7 @@ where da.teacher.id = :userId
     def findStudents(String[] ids) {
         Student.executeQuery'''
 select st.id
-from Student st join st.department d join st.major mj join mj.subject sj
+from Student st join st.department d join st.subject mj join mj.subject sj
 where d.id in (:departments) and st.id in (:ids) and sj.isDualDegree is true
 ''', [departments: deptAdmins, ids: ids]
     }
@@ -73,7 +73,7 @@ where st.student.id in (:ids)
         Student.executeQuery'''
 select distinct st.id
 from Student st, Agreement agreement join agreement.item item 
-where st.id in (:ids) and st.major.id = item.major.id and agreement.region.id = :regionId
+where st.id in (:ids) and st.subject.id = item.subject.id and agreement.region.id = :regionId
 ''', [ids: ids, regionId: regionId]
     }
 
