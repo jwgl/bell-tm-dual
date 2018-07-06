@@ -258,47 +258,25 @@ where a.id = :id
      */
     def findAgreementsByDepartment(String departmentId) {
         def list = AgreementSubject.executeQuery'''
-select new map(
-    subject.id                  as id,
-    item.majorOptions           as majorOptions,
-    subject.grade               as grade,
-    subject.name                as subjectName,
-    gr.name                     as regionName,
-    agreement.universityEn      as universityEn,
-    agreement.universityCn      as universityCn
+select distinct new map(
+    item.id                as id,
+    item.startedGrade      as startedGrade,
+    item.endedGrade        as endedGrade,
+    sj.name                as subjectName,
+    gr.name                as regionName,
+    u.nameEn               as nameEn
 )
-from AgreementSubject item join item.subject subject 
-join subject.department department
-join item.agreement agreement
-join agreement.university university
-join university.region gr
-where department.id = :id
-order by subject.name, gr.name, agreement.universityEn, subject.grade, item.majorOptions
+from AgreementSubject item join item.subject sj 
+join sj.department d
+join item.agreement ag
+join ag.university u
+join u.region gr
+where d.id = :id
 ''', [id: departmentId]
-        List<GroupCondition> conditions = [
-                new GroupCondition(
-                        groupBy: 'subjectName',
-                        into: 'regions',
-                        mappings: [
-                                subjectName: 'name'
-                        ]
-                ),
-                new GroupCondition(
-                        groupBy: 'regionName',
-                        into: 'universities',
-                        mappings: [
-                                regionName: 'name'
-                        ]
-                ),
-                new GroupCondition(
-                        groupBy: 'universityEn',
-                        into: 'grades',
-                        mappings: [
-                                universityEn: 'name'
-                        ]
-                ),
-        ]
-        return CollectionUtils.groupBy(list, conditions)
+        list.each { item ->
+            item['coMajors'] = findCoMajors(item.id as Long)
+        }
+        return list
     }
 
     /**
