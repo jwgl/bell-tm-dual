@@ -41,6 +41,5 @@ class AgreementSubject {
 
     static constraints = {
         dateCreated nullable: true
-        subject       unique: 'agreement'
     }
 }

@@ -37,7 +37,7 @@ from StudentAbroad sa
 join sa.student st 
 join sa.agreementRegion g
 join st.department d 
-join st.subject mj 
+join st.major mj 
 join mj.subject sj 
 join st.adminClass ac
 where d.id in (:departments) and sa.enabled is true
@@ -69,12 +69,12 @@ where d.id in (:departments) and sa.enabled is true
 ''', [user: me, agreementRegion: region, ids: students]
 
         // 写入自助打印系统
-        if (studentsEto && studentsEto.size()) {
-            StudentAbroadEto.executeUpdate'''
-    insert into StudentAbroadEto (studentId, studentName, dateCreated, creator, enabled, region)
-    select st.id, st.name, now(), :userId, true, :agreementRegion from Student st where st.id in (:ids)
-''', [userId: me.id, agreementRegion: region.name, ids: studentsEto]
-        }
+//        if (studentsEto && studentsEto.size()) {
+//            StudentAbroadEto.executeUpdate'''
+//    insert into StudentAbroadEto (studentId, studentName, dateCreated, creator, enabled, region)
+//    select st.id, st.name, now(), :userId, true, :agreementRegion from Student st where st.id in (:ids)
+//''', [userId: me.id, agreementRegion: region.name, ids: studentsEto]
+//        }
         userLogService.log(securityService.userId,securityService.ipAddress,"CREATE", students.size(),"批量导入出国学生")
         return null
     }
@@ -110,7 +110,7 @@ select distinct new map(
 sj.id as id,
 sj.name as name
 )
-from CooperativeMajor mj join mj.subject sj
+from Major mj join mj.subject sj
 where mj.department.id in (:departments) and sj.isDualDegree is true
 order by sj.name
 ''', [departments: studentValidateService.deptAdmins]
@@ -119,7 +119,7 @@ order by sj.name
     def getGrades() {
         Major.executeQuery'''
 select distinct mj.grade
-from CooperativeMajor mj join mj.subject sj
+from Major mj join mj.subject sj
 where mj.department.id in (:departments) and sj.isDualDegree is true
 order by mj.grade
 ''', [departments: studentValidateService.deptAdmins]

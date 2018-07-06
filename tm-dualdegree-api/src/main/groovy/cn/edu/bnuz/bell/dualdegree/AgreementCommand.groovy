@@ -15,7 +15,7 @@ class AgreementCommand {
         /**
          * 校内专业
          */
-        Integer id
+        String id
         Integer startedGrade
         Integer endedGrade
         List<Integer>   coMajors

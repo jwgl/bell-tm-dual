@@ -11,11 +11,10 @@ class UrlMappings {
                 }
             }
             "/universities"(resources: 'cooperativeUniversity')
+            "/carryout"(resources: 'agreementCarryout')
         }
 
-        "/agreements"(resources: 'agreementPublic', includes: ['index', 'show']) {
-            "/getMajorOptionCn"(controller: 'agreementPublic', action: 'getMajorOptionCn', method: 'GET')
-        }
+        "/agreements"(resources: 'agreementPublic', includes: ['index', 'show'])
 
         group "/settings", {
             "/users"(resources: 'setting')
