@@ -264,7 +264,8 @@ join asj.agreement ag
 join ag.university u
 join asj.items item
 join item.cooperativeMajor cm,
-StudentAbroad sa join sa.student st
+StudentAbroad sa 
+join sa.student st
 join st.major mj
 where u.region.id = sa.agreementRegion.id 
 and st.id = :studentId 

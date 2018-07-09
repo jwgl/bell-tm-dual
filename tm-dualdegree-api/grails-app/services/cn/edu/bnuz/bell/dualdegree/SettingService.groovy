@@ -19,7 +19,9 @@ d.name as departmentName,
 t.id as teacherId,
 t.name as teacherName
 )
-from DepartmentAdministrator da join da.department d join da.teacher t
+from DepartmentAdministrator da 
+join da.department d 
+join da.teacher t
 order by d.name
 '''
     }

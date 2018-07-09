@@ -28,7 +28,8 @@ select distinct new map(
     u.nameCn                    as      universityCn,
     agreement.memo              as      memo
 )
-from Agreement agreement join agreement.university u
+from Agreement agreement 
+join agreement.university u
 join u.region gr
 join agreement.item item
 join item.subject subject
@@ -110,7 +111,8 @@ select new map(
     department.enabled as enabled,
     department.name as departmentName    
 )
-from Subject subject join subject.department department
+from Subject subject 
+join subject.department department
 where subject.isDualDegree is true
 order by department.name, subject.name
 '''
@@ -243,7 +245,9 @@ select new map(
     c.nameCn as nameCn,
     r.name as region
 )
-from Agreement a join a.university c join c.region r
+from Agreement a 
+join a.university c 
+join c.region r
 where a.id = :id
 ''', [id: id]
         if (result) {
@@ -266,7 +270,8 @@ select distinct new map(
     gr.name                as regionName,
     u.nameEn               as nameEn
 )
-from AgreementSubject item join item.subject sj 
+from AgreementSubject item 
+join item.subject sj 
 join sj.department d
 join item.agreement ag
 join ag.university u
@@ -291,7 +296,8 @@ select new map(
     c.nameCn as nameCn,
     r.name as region
 )
-from CooperativeUniversity c join c.region r
+from CooperativeUniversity c 
+join c.region r
 '''
     }
 }

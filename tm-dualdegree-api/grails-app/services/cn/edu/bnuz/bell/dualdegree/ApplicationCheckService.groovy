@@ -85,7 +85,8 @@ order by form.dateApproved desc
     def countTodoList(String teacherId) {
         dataAccessService.getLong '''
 select count(*)
-from DegreeApplication form join form.award award
+from DegreeApplication form 
+join form.award award
 where current_date between award.requestBegin and award.approvalEnd
 and form.status = :status
 and form.approver.id = :teacherId
@@ -152,7 +153,8 @@ and form.approver.id = :teacherId
             case ListType.TODO:
                 return dataAccessService.getLong('''
 select form.id
-from DegreeApplication form join form.award award
+from DegreeApplication form 
+join form.award award
 where current_date between award.requestBegin and award.approvalEnd
 and form.status = :status
 and form.approver.id = :teacherId
@@ -177,7 +179,8 @@ order by form.dateApproved asc
             case ListType.TODO:
                 return dataAccessService.getLong('''
 select form.id
-from DegreeApplication form join form.award award
+from DegreeApplication form 
+join form.award award
 where current_date between award.requestBegin and award.approvalEnd
 and form.status = :status
 and form.approver.id = :teacherId

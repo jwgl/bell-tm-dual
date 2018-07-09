@@ -48,7 +48,8 @@ class StudentValidateService {
     }
     def getDeptAdmins() {
         DepartmentAdministrator.executeQuery'''
-select d.id from DepartmentAdministrator da join da.department d 
+select d.id from DepartmentAdministrator da 
+join da.department d 
 where da.teacher.id = :userId
 ''', [userId: securityService.userId]
     }
@@ -56,7 +57,9 @@ where da.teacher.id = :userId
     def findStudents(String[] ids) {
         Student.executeQuery'''
 select st.id
-from Student st join st.department d join st.major mj join mj.subject sj
+from Student st 
+join st.department d 
+join st.major mj join mj.subject sj
 where d.id in (:departments) and st.id in (:ids) and sj.isDualDegree is true
 ''', [departments: deptAdmins, ids: ids]
     }
@@ -72,8 +75,11 @@ where st.student.id in (:ids)
     def regionMatch(String[] ids, Long regionId) {
         Student.executeQuery'''
 select distinct st.id
-from Student st join st.major major, 
-Agreement agreement join agreement.item item join agreement.university university
+from Student st 
+join st.major major, 
+Agreement agreement 
+join agreement.item item 
+join agreement.university university
 where st.id in (:ids) and major.subject.id = item.subject.id 
 and major.grade between item.startedGrade - 1 and item.endedGrade
 and university.region.id = :regionId

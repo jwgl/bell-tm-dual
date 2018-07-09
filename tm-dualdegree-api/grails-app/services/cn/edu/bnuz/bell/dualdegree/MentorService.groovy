@@ -25,7 +25,9 @@ select new map(
     m.email as email,
     d.name as departmentName
 )
-from Mentor m join m.teacher t join m.department d
+from Mentor m 
+join m.teacher t 
+join m.department d
 where d.id = :department
 ''', [department: securityService.departmentId]
     }
@@ -58,7 +60,8 @@ select new map(
     t.name as teacherName,
     m.email as email
 )
-from Mentor m join m.teacher t
+from Mentor m 
+join m.teacher t
 where m.id = :id
 ''', [id: id]
     }

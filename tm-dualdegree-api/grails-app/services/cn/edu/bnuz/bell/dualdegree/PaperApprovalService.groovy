@@ -164,7 +164,8 @@ p.type as type,
 p.chineseTitle as chineseTitle,
 p.englishTitle as englishTitle,
 p.name as name
-) from DegreeApplication da join da.paperForm p where da.id = :id
+) from DegreeApplication da 
+join da.paperForm p where da.id = :id
 ''', [id: mainFormId]
         if (result) {
             return result[0]
@@ -177,7 +178,8 @@ p.name as name
             case ListType.TODO:
                 return dataAccessService.getLong('''
 select form.id
-from DegreeApplication form join form.award award
+from DegreeApplication form 
+join form.award award
 join form.approver approver
 left join form.paperApprover paperApprover
 where current_date between award.requestBegin and award.approvalEnd
@@ -204,7 +206,8 @@ order by form.datePaperSubmitted desc
             case ListType.TODO:
                 return dataAccessService.getLong('''
 select form.id
-from DegreeApplication form join form.award award
+from DegreeApplication form 
+join form.award award
 join form.approver approver
 left join form.paperApprover paperApprover
 where current_date between award.requestBegin and award.approvalEnd

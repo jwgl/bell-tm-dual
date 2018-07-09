@@ -23,7 +23,8 @@ select new map(
     ba.dateCreated as dateCreated,
     ba.department.name as departmentName
 )
-from Award ba, DepartmentAdministrator da join da.teacher t
+from Award ba, DepartmentAdministrator da 
+join da.teacher t
 where ba.department = da.department and da.teacher.id = :userId
 order by ba.dateCreated desc
 ''', [userId: securityService.userId]
@@ -77,7 +78,8 @@ select new map(
     d.id as id,
     d.name as name
 )
-from DepartmentAdministrator da join da.department d 
+from DepartmentAdministrator da 
+join da.department d 
 where da.teacher.id = :userId
 ''', [userId: securityService.userId]
     }
@@ -99,7 +101,8 @@ select new map(
     d.name             as      departmentName
     
 )
-from Award award join award.department d
+from Award award 
+join award.department d
 where award.id = :id
 ''', [id: id]
         if(!results) {

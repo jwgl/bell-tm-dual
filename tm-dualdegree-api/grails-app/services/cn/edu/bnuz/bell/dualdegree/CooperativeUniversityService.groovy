@@ -20,7 +20,9 @@ select new map(
     cm.nameEn as majorEn,
     cm.bachelor as bachelor
 )
-from CooperativeUniversity cu left join cu.cooperativeMajors cm join cu.region rg 
+from CooperativeUniversity cu 
+left join cu.cooperativeMajors cm 
+join cu.region rg 
 order by rg.name,cu.nameEn
 '''
         List<GroupCondition> conditions = [
@@ -113,7 +115,8 @@ select new map(
     cu.nameEn as nameEn,
     rg.id as regionId
 )
-from CooperativeUniversity cu join cu.region rg 
+from CooperativeUniversity cu 
+join cu.region rg 
 where cu.id = :id
 ''', [id: id]
         if (result) {
@@ -152,7 +155,8 @@ select new map(
     cu.nameEn as nameEn,
     rg.name as region
 )
-from CooperativeUniversity cu join cu.region rg 
+from CooperativeUniversity cu 
+join cu.region rg 
 where cu.id = :id
 ''', [id: id]
         if (result) {
