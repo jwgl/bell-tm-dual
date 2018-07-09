@@ -7,6 +7,8 @@ import cn.edu.bnuz.bell.organization.Department
 import cn.edu.bnuz.bell.organization.Student
 import cn.edu.bnuz.bell.organization.Teacher
 import cn.edu.bnuz.bell.security.SecurityService
+import cn.edu.bnuz.bell.utils.CollectionUtils
+import cn.edu.bnuz.bell.utils.GroupCondition
 import cn.edu.bnuz.bell.workflow.DomainStateMachineHandler
 import cn.edu.bnuz.bell.workflow.commands.SubmitCommand
 import grails.gorm.transactions.Transactional
@@ -191,7 +193,7 @@ where form.id = :id
         Student student = Student.get(userId)
         // 15级是分水岭，以前的采用CoUniversity，后面的采用协议中的合作大学
         def universities
-        if (student.major.grade <= 2015) {
+        if (student.major.grade < 2015) {
             universities = getCooperativeUniversity(student.department.id)
         } else {
             universities = getCooperativeUniversity(student)
@@ -249,17 +251,37 @@ where c.department.id = :departmentId
     }
 
     private List<Map<String, String>> getCooperativeUniversity(Student student) {
-        AgreementSubject.executeQuery'''
-select new map(
-    ag.universityEn as universityEn,
-    ag.universityCn as universityCn
+        def list =AgreementSubject.executeQuery'''
+select distinct new map(
+    u.nameEn    as universityEn,
+    u.nameCn    as universityCn,
+    cm.nameEn   as majorEn,
+    cm.nameCn   as majorCn,
+    cm.bachelor as bachelor
 )
-from AgreementSubject agmj 
-join agmj.agreement ag
-join ag.region agRegion,
-StudentAbroad sa join sa.agreementRegion saRegion join sa.student student
-where agRegion = saRegion and student.id = :studentId and student.subject = agmj.subject
+from AgreementSubject asj 
+join asj.agreement ag
+join ag.university u
+join asj.items item
+join item.cooperativeMajor cm,
+StudentAbroad sa join sa.student st
+join st.major mj
+where u.region.id = sa.agreementRegion.id 
+and st.id = :studentId 
+and mj.subject = asj.subject
+and (mj.grade between asj.startedGrade -1 and asj.endedGrade)
 ''', [studentId: student.id]
+        List<GroupCondition> conditions = [
+                new GroupCondition(
+                        groupBy: 'universityEn',
+                        into: 'subjects',
+                        mappings: [
+                                universityEn: 'universityEn',
+                                universityCn: 'universityCn'
+                        ]
+                )
+        ]
+        CollectionUtils.groupBy(list, conditions)
     }
 
     Map<String, String> findFiles(String studentId, id) {
