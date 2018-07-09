@@ -75,12 +75,6 @@ order by agreement.name
                 ))
             }
             form.addToItem(agreementMajor)
-            // 添加到自助打印系统中，改到执行时才推送
-//            def majorRegionEto = new MajorRegionEto(majorId: item.id, region: form.university.region.name)
-//            def check = MajorRegionEto.get(majorRegionEto)
-//            if (!check) {
-//                majorRegionEto.save()
-//            }
         }
         form.save(flush: true)
         return form

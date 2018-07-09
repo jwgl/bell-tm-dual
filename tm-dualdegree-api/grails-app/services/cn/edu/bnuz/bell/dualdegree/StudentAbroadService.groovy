@@ -68,13 +68,6 @@ where d.id in (:departments) and sa.enabled is true
     select st, :user, now(), :agreementRegion, true from Student st where st.id in (:ids) 
 ''', [user: me, agreementRegion: region, ids: students]
 
-        // 写入自助打印系统
-//        if (studentsEto && studentsEto.size()) {
-//            StudentAbroadEto.executeUpdate'''
-//    insert into StudentAbroadEto (studentId, studentName, dateCreated, creator, enabled, region)
-//    select st.id, st.name, now(), :userId, true, :agreementRegion from Student st where st.id in (:ids)
-//''', [userId: me.id, agreementRegion: region.name, ids: studentsEto]
-//        }
         userLogService.log(securityService.userId,securityService.ipAddress,"CREATE", students.size(),"批量导入出国学生")
         return null
     }

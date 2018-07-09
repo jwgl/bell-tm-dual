@@ -30,7 +30,7 @@ order by subjectName,grade,regionName
         if (MajorRegionEto.get(eto)) {
             throw new BadRequestException()
         }
-//        eto.save()
+        eto.save()
         eto
     }
 }
