@@ -17,10 +17,10 @@ class PaperFormService {
     def getPaperForm(String studentId, Long applicationFormId) {
         def result = DegreeApplication.executeQuery'''
 select new map(
-pf.type as type,
-pf.name as name,
-pf.chineseTitle as chineseTitle,
-pf.englishTitle as englishTitle
+    pf.type as type,
+    pf.name as name,
+    pf.chineseTitle as chineseTitle,
+    pf.englishTitle as englishTitle
 )
 from DegreeApplication da 
 join da.paperForm pf

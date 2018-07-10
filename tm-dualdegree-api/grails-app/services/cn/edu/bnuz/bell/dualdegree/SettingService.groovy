@@ -13,11 +13,11 @@ class SettingService {
     def list() {
         DepartmentAdministrator.executeQuery'''
 select new map(
-da.id as id,
-d.id as departmentId,
-d.name as departmentName,
-t.id as teacherId,
-t.name as teacherName
+    da.id as id,
+    d.id as departmentId,
+    d.name as departmentName,
+    t.id as teacherId,
+    t.name as teacherName
 )
 from DepartmentAdministrator da 
 join da.department d 

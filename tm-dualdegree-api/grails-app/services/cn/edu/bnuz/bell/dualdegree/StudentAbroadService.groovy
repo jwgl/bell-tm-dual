@@ -20,18 +20,18 @@ class StudentAbroadService {
     def list(StudentOptionsCommand cmd) {
         def result = StudentAbroad.executeQuery'''
 select new map(
-sa.id as id,
-g.name as regionName,
-g.id as regionId,
-st.id as studentId,
-st.name as studentName,
-st.sex as sex,
-st.atSchool as atSchool,
-d.name as departmentName,
-mj.grade as grade,
-sj.name as subjectName,
-sj.id as subjectId,
-ac.name as adminClassName
+    sa.id as id,
+    g.name as regionName,
+    g.id as regionId,
+    st.id as studentId,
+    st.name as studentName,
+    st.sex as sex,
+    st.atSchool as atSchool,
+    d.name as departmentName,
+    mj.grade as grade,
+    sj.name as subjectName,
+    sj.id as subjectId,
+    ac.name as adminClassName
 )
 from StudentAbroad sa 
 join sa.student st 
@@ -100,8 +100,8 @@ from AgreementRegion g
     def getSubjects() {
         Major.executeQuery'''
 select distinct new map(
-sj.id as id,
-sj.name as name
+    sj.id as id,
+    sj.name as name
 )
 from Major mj 
 join mj.subject sj
