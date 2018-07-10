@@ -35,15 +35,15 @@ class PaperApprovalService {
     def findTodoList(String teacherId, Map args) {
         DegreeApplication.executeQuery '''
 select new map(
-  form.id as id,
-  student.id as studentId,
-  student.name as studentName,
-  student.sex as sex,
-  adminClass.name as className,
-  form.dateSubmitted as date,
-  paperApprover.name as paperApprover,
-  award.id as awardId,
-  form.status as status
+    form.id as id,
+    student.id as studentId,
+    student.name as studentName,
+    student.sex as sex,
+    adminClass.name as className,
+    form.dateSubmitted as date,
+    paperApprover.name as paperApprover,
+    award.id as awardId,
+    form.status as status
 )
 from DegreeApplication form
 join form.student student
@@ -61,14 +61,14 @@ order by form.datePaperSubmitted
     def findDoneList(String teacherId, Map args) {
         DegreeApplication.executeQuery '''
 select new map(
-  form.id as id,
-  student.id as studentId,
-  student.name as studentName,
-  student.sex as sex,
-  adminClass.name as className,
-  paperApprover.name as paperApprover,
-  form.dateSubmitted as date,
-  form.status as status
+    form.id as id,
+    student.id as studentId,
+    student.name as studentName,
+    student.sex as sex,
+    adminClass.name as className,
+    paperApprover.name as paperApprover,
+    form.dateSubmitted as date,
+    form.status as status
 )
 from DegreeApplication form
 join form.student student
@@ -160,10 +160,10 @@ and paperApprover.id = :teacherId
     private Map getPaperForm(Long mainFormId) {
         def result = DegreeApplication.executeQuery'''
 select new map(
-p.type as type,
-p.chineseTitle as chineseTitle,
-p.englishTitle as englishTitle,
-p.name as name
+    p.type as type,
+    p.chineseTitle as chineseTitle,
+    p.englishTitle as englishTitle,
+    p.name as name
 ) from DegreeApplication da 
 join da.paperForm p where da.id = :id
 ''', [id: mainFormId]
