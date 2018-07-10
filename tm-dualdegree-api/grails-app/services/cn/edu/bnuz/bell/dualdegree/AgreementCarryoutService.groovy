@@ -1,6 +1,6 @@
 package cn.edu.bnuz.bell.dualdegree
 
-import cn.edu.bnuz.bell.dualdegree.dv.DvAgreementCarryoutView
+import cn.edu.bnuz.bell.dualdegree.dv.AgreementCarryoutView
 import cn.edu.bnuz.bell.dualdegree.eto.MajorRegionEto
 import cn.edu.bnuz.bell.http.BadRequestException
 import grails.gorm.transactions.Transactional
@@ -9,16 +9,16 @@ import grails.gorm.transactions.Transactional
 class AgreementCarryoutService {
 
     def list() {
-        DvAgreementCarryoutView.executeQuery'''
+        AgreementCarryoutView.executeQuery'''
 select new map(
-    subjectId       as subjectId,
-    subjectName     as subjectName,
-    regionName      as regionName,
-    grade           as grade,
-    majorId         as majorId
+    subjectId as subjectId,
+    subjectName as subjectName,
+    regionName as regionName,
+    grade as grade,
+    majorId as majorId
 )
-from DvAgreementCarryoutView 
-order by subjectName,grade,regionName
+from AgreementCarryoutView 
+order by subjectName, grade, regionName
 '''
     }
 

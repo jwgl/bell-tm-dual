@@ -32,8 +32,8 @@ class ApplicationFormService {
         DegreeApplication.executeQuery'''
 select new map(
     da.id as applicationId,
-    ba.id   as id,
-    ba.title   as title,
+    ba.id as id,
+    ba.title as title,
     ba.requestBegin as requestBegin,
     ba.requestEnd as requestEnd,
     ba.paperEnd as paperEnd,
@@ -47,7 +47,7 @@ from DegreeApplication da
 right join da.award ba with da.student.id = :userId
 where (ba.approvalEnd >= :date or da.student is not null)
 and ba.department.id = :departmentId
-''', [userId: userId, date: LocalDate.now(),departmentId: securityService.departmentId]
+''', [userId: userId, date: LocalDate.now(), departmentId: securityService.departmentId]
     }
 
     /**
@@ -253,10 +253,10 @@ where c.department.id = :departmentId
     private List<Map<String, String>> getCooperativeUniversity(Student student) {
         def list =AgreementSubject.executeQuery'''
 select distinct new map(
-    u.nameEn    as universityEn,
-    u.nameCn    as universityCn,
-    cm.nameEn   as majorEn,
-    cm.nameCn   as majorCn,
+    u.nameEn as universityEn,
+    u.nameCn as universityCn,
+    cm.nameEn as majorEn,
+    cm.nameCn as majorCn,
     cm.bachelor as bachelor
 )
 from AgreementSubject asj 

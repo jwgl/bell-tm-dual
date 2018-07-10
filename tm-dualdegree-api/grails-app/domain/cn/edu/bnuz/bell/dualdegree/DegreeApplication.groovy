@@ -109,7 +109,7 @@ class DegreeApplication implements StateObject {
     static hasOne = [paperForm: PaperForm]
 
     static mapping = {
-        comment '出国学生学位申请'
+        comment                          '出国学生学位申请'
         table                            schema: 'tm_dual'
         id                               generator: 'identity', comment: 'ID'
         award                            comment: '学位授予工作'

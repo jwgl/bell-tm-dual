@@ -1,17 +1,17 @@
 package cn.edu.bnuz.bell.dualdegree.eto
 
 class StudentAbroadEto {
-    String  studentId
-    String  studentName
-    Date    dateCreated
-    Date    dateDeleted
-    String  creator
-    String  deleter
+    String studentId
+    String studentName
+    Date dateCreated
+    Date dateDeleted
+    String creator
+    String deleter
     Boolean enabled
-    String  region
+    String region
     static mapping = {
-        table name: 'et_dualdegree_student'
-        id generator: 'sequence',params: [sequence:'student_print_id_seq']
+        table           name: 'et_dualdegree_student'
+        id              generator: 'sequence',params: [sequence:'student_print_id_seq']
         studentId       length: 20, comment: '学号'
         studentName     length: 50, comment: '姓名'
         dateCreated     comment: '添加日期'
@@ -24,6 +24,6 @@ class StudentAbroadEto {
 
     static constraints = {
         dateDeleted     nullable: true
-        deleter nullable: true
+        deleter         nullable: true
     }
 }

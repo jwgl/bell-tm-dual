@@ -28,7 +28,7 @@ class PaperForm {
     String name
 
     static mapping = {
-        comment '论文互认表'
+        comment               '论文互认表'
         table                 schema: 'tm_dual'
         id                    generator: 'identity', comment: 'ID'
         type                  comment: '课程类型'
@@ -39,6 +39,6 @@ class PaperForm {
     }
 
     static constraints = {
-        name    nullable: true
+        name                  nullable: true
     }
 }

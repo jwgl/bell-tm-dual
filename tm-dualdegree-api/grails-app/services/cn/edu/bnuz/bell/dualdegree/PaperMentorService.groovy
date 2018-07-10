@@ -132,14 +132,14 @@ and paperApprover.id is not null
         }
 
         return [
-                form               : form,
-                counts             : getCounts(teacherId),
-                workitemId         : workitem ? workitem.id : null,
-                settings           : Award.get(form.awardId),
-                fileNames          : applicationFormService.findFiles(form.studentId, form.awardId),
-                prevId             : getPrevReviewId(teacherId, id, type),
-                nextId             : getNextReviewId(teacherId, id, type),
-                paperForm          : getPaperForm(id),
+                form: form,
+                counts: getCounts(teacherId),
+                workitemId: workitem ? workitem.id : null,
+                settings: Award.get(form.awardId),
+                fileNames: applicationFormService.findFiles(form.studentId, form.awardId),
+                prevId: getPrevReviewId(teacherId, id, type),
+                nextId: getNextReviewId(teacherId, id, type),
+                paperForm: getPaperForm(id),
         ]
     }
 
@@ -151,14 +151,14 @@ and paperApprover.id is not null
         }
 
         return [
-                form               : form,
-                counts             : getCounts(teacherId),
-                workitemId         : workitemId,
-                settings           : Award.get(form.awardId),
-                fileNames          : applicationFormService.findFiles(form.studentId, form.awardId),
-                prevId             : getPrevReviewId(teacherId, id, type),
-                nextId             : getNextReviewId(teacherId, id, type),
-                paperForm          : getPaperForm(id),
+                form: form,
+                counts: getCounts(teacherId),
+                workitemId: workitemId,
+                settings: Award.get(form.awardId),
+                fileNames: applicationFormService.findFiles(form.studentId, form.awardId),
+                prevId: getPrevReviewId(teacherId, id, type),
+                nextId: getNextReviewId(teacherId, id, type),
+                paperForm: getPaperForm(id),
         ]
     }
 

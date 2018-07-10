@@ -21,12 +21,12 @@ class AgreementService {
     def list(AgreementFilterCommand cmd) {
         def queryStr = '''
 select distinct new map(
-    agreement.id                as      id,
-    agreement.name              as      name,
-    gr.name                     as      regionName,
-    u.nameEn                    as      universityEn,
-    u.nameCn                    as      universityCn,
-    agreement.memo              as      memo
+    agreement.id as id,
+    agreement.name as name,
+    gr.name as regionName,
+    u.nameEn as universityEn,
+    u.nameCn as universityCn,
+    agreement.memo as memo
 )
 from Agreement agreement 
 join agreement.university u
@@ -58,9 +58,9 @@ order by agreement.name
      */
     def create(AgreementCommand cmd) {
         Agreement form = new Agreement(
-                name:               cmd.agreementName,
-                university:         CooperativeUniversity.load(cmd.universityId),
-                memo:               cmd.memo
+                name: cmd.agreementName,
+                university: CooperativeUniversity.load(cmd.universityId),
+                memo: cmd.memo
         )
         cmd.addedItems.each { item ->
             def agreementMajor = new AgreementSubject(
@@ -86,7 +86,7 @@ order by agreement.name
     def getRegions() {
         AgreementRegion.executeQuery'''
 select new map(
-    gr.id   as id,
+    gr.id as id,
     gr.name as name
 )
 from AgreementRegion gr
@@ -99,9 +99,9 @@ from AgreementRegion gr
     def getSubjects() {
         Subject.executeQuery'''
 select new map(
-    subject.id      as id,
-    subject.name    as subjectName,
-    department.id   as departmentId,
+    subject.id as id,
+    subject.name as subjectName,
+    department.id as departmentId,
     department.enabled as enabled,
     department.name as departmentName    
 )
@@ -139,9 +139,9 @@ order by department.name, subject.name
     def getFormForShow(Long id) {
         def result = Agreement.executeQuery '''
 select new map(
-    agreement.id                as      id,
-    agreement.name              as      agreementName,
-    agreement.memo              as      memo
+    agreement.id as id,
+    agreement.name as agreementName,
+    agreement.memo as memo
 )
 from Agreement agreement
 where agreement.id = :id
@@ -200,13 +200,13 @@ where agreement.id = :id
     def findAgreementSubjects(Long agreementId) {
         AgreementSubject.executeQuery'''
 select new map(
-    am.id                as agreementSubjectId,
-    subject.id           as id,
-    subject.name         as subjectName,
-    am.startedGrade      as startedGrade,
-    am.endedGrade        as endedGrade,
-    department.id        as departmentId,
-    department.name      as departmentName
+    am.id as agreementSubjectId,
+    subject.id as id,
+    subject.name as subjectName,
+    am.startedGrade as startedGrade,
+    am.endedGrade as endedGrade,
+    department.id as departmentId,
+    department.name as departmentName
 )
 from AgreementSubject am 
 join am.subject subject 
@@ -219,10 +219,10 @@ order by department.name, subject.name
     def findCoMajors(Long itemId) {
         AgreementCooperativeMajor.executeQuery'''
 select new map(
-    cm.id           as id,
-    cm.nameEn       as nameEn,
-    cm.nameCn       as nameCn,
-    cm.bachelor     as bachelor    
+    cm.id as id,
+    cm.nameEn as nameEn,
+    cm.nameCn as nameCn,
+    cm.bachelor as bachelor    
 )
 from AgreementCooperativeMajor acm 
 join acm.cooperativeMajor cm
@@ -257,12 +257,12 @@ where a.id = :id
     def findAgreementsByDepartment(String departmentId) {
         def list = AgreementSubject.executeQuery'''
 select distinct new map(
-    item.id                as id,
-    item.startedGrade      as startedGrade,
-    item.endedGrade        as endedGrade,
-    sj.name                as subjectName,
-    gr.name                as regionName,
-    u.nameEn               as nameEn
+    item.id as id,
+    item.startedGrade as startedGrade,
+    item.endedGrade as endedGrade,
+    sj.name as subjectName,
+    gr.name as regionName,
+    u.nameEn as nameEn
 )
 from AgreementSubject item 
 join item.subject sj 

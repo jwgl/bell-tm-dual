@@ -13,8 +13,8 @@ class AwardService {
     def list() {
         Award.executeQuery'''
 select new map(
-    ba.id   as id,
-    ba.title   as title,
+    ba.id as id,
+    ba.title as title,
     ba.requestBegin as requestBegin,
     ba.requestEnd as requestEnd,
     ba.paperEnd as paperEnd,
@@ -33,8 +33,8 @@ order by ba.dateCreated desc
     def list(String departmentId) {
         Award.executeQuery'''
 select new map(
-    ba.id   as id,
-    ba.title   as title,
+    ba.id as id,
+    ba.title as title,
     ba.requestBegin as requestBegin,
     ba.requestEnd as requestEnd,
     ba.paperEnd as paperEnd,
@@ -90,15 +90,15 @@ where da.teacher.id = :userId
     Map getFormForShow(Long id) {
         def results =Award.executeQuery '''
 select new map(
-    award.id           as      id,
-    award.title        as      title,
-    award.requestBegin as      requestBegin,
-    award.requestEnd   as      requestEnd,
-    award.paperEnd     as      paperEnd,
-    award.approvalEnd  as      approvalEnd,
-    award.content      as      content,
-    d.id               as      departmentId,
-    d.name             as      departmentName
+    award.id as id,
+    award.title as title,
+    award.requestBegin as requestBegin,
+    award.requestEnd as requestEnd,
+    award.paperEnd as paperEnd,
+    award.approvalEnd as approvalEnd,
+    award.content as content,
+    d.id as departmentId,
+    d.name as departmentName
     
 )
 from Award award 

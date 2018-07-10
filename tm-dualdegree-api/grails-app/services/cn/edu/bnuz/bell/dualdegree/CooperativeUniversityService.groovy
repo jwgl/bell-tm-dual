@@ -30,11 +30,11 @@ order by rg.name,cu.nameEn
                         groupBy: 'cuId',
                         into: 'majors',
                         mappings: [
-                                cuId:                   'cuId',
-                                universityShortName:    'shortName',
-                                universityEn:           'universityEn',
-                                universityCn:           'universityCn',
-                                region:                 'region'
+                                cuId: 'cuId',
+                                universityShortName: 'shortName',
+                                universityEn: 'universityEn',
+                                universityCn: 'universityCn',
+                                region: 'region'
                         ]
                 ),
         ]
@@ -46,10 +46,10 @@ order by rg.name,cu.nameEn
      */
     def create(CooperativeUniversityCommand cmd) {
         CooperativeUniversity form = new CooperativeUniversity(
-                nameEn:             cmd.nameEn,
-                shortName:          cmd.shortName.length() > 10 ? getShortName(cmd.nameEn) : cmd.shortName,
-                region:             AgreementRegion.load(cmd.regionId),
-                nameCn:             cmd.nameCn
+                nameEn: cmd.nameEn,
+                shortName: cmd.shortName.length() > 10 ? getShortName(cmd.nameEn) : cmd.shortName,
+                region: AgreementRegion.load(cmd.regionId),
+                nameCn: cmd.nameCn
         )
         cmd.addedItems.each { item ->
             form.addToCooperativeMajors(new CooperativeMajor(
@@ -96,7 +96,7 @@ order by rg.name,cu.nameEn
     def getRegions() {
         AgreementRegion.executeQuery'''
 select new map(
-    gr.id   as id,
+    gr.id as id,
     gr.name as name
 )
 from AgreementRegion gr
@@ -131,11 +131,11 @@ where cu.id = :id
     def findCooperativeMajors(Long id) {
         CooperativeMajor.executeQuery'''
 select new map(
-    item.id               as id,
-    item.nameEn           as nameEn,
-    item.shortName        as shortName,
-    item.nameCn           as nameCn,
-    item.bachelor         as bachelor
+    item.id as id,
+    item.nameEn as nameEn,
+    item.shortName as shortName,
+    item.nameCn as nameCn,
+    item.bachelor as bachelor
 )
 from CooperativeMajor item
 where item.university.id = :id

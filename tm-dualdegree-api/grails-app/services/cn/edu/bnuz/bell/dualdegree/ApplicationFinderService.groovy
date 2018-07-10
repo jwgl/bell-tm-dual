@@ -42,7 +42,7 @@ order by form.dateSubmitted, student.id
         }
 
         return [
-                form     : form,
+                form: form,
                 fileNames: applicationFormService.findFiles(form.studentId as String, form.awardId),
                 paperForm: paperFormService.getPaperForm(form.studentId as String, id)
         ]

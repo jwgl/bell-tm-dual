@@ -21,15 +21,15 @@ class Mentor {
     String email
 
     static mapping = {
-        comment '论文指导老师'
+        comment     '论文指导老师'
         table       schema: 'tm_dual'
-        id generator: 'identity', comment: '无意义ID'
+        id          generator: 'identity', comment: '无意义ID'
         department  comment: '聘用部门'
         teacher     comment: '教师'
         email       comment: '邮件地址'
     }
 
     static constraints = {
-        teacher unique: 'department'
+        teacher     unique: 'department'
     }
 }

@@ -11,11 +11,11 @@ class StudentAbroadController {
 
     def index() {
         StudentOptionsCommand optionsCommand = new StudentOptionsCommand(
-                sujectId:  params['subjectId'],
-                regionId:  params.getInt('regionId') ?: 0,
-                grade:  params.getInt('grade') ?: 0,
-                studentId:  params['studentId'],
-                studentName:  params['studentName']
+                sujectId: params['subjectId'],
+                regionId: params.getInt('regionId') ?: 0,
+                grade: params.getInt('grade') ?: 0,
+                studentId: params['studentId'],
+                studentName: params['studentName']
         )
         renderJson(studentAbroadService.list(optionsCommand))
     }

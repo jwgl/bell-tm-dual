@@ -17,8 +17,8 @@ class PaperFormService {
     def getPaperForm(String studentId, Long applicationFormId) {
         def result = DegreeApplication.executeQuery'''
 select new map(
-pf.type  as type,
-pf.name  as name,
+pf.type as type,
+pf.name as name,
 pf.chineseTitle as chineseTitle,
 pf.englishTitle as englishTitle
 )
@@ -64,7 +64,7 @@ where da.id = :id and da.student.id = :studentId
     def getUser(Long id) {
         def form = DegreeApplication.load(id)
         def user = form.paperApprover ?: form.approver
-        return [[id : user.id, name: user.name]]
+        return [[id: user.id, name: user.name]]
     }
 
 

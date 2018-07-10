@@ -3,7 +3,7 @@ package cn.edu.bnuz.bell.dualdegree.dv
 /**
  * 可执行协议专业视图
  */
-class DvAgreementCarryoutView {
+class AgreementCarryoutView {
     /**
      * 专业Id
      */
@@ -31,6 +31,6 @@ class DvAgreementCarryoutView {
 
     static mapping = {
         comment      '可执行协议专业视图'
-        table        schema: 'tm_dual'
+        table        name: 'dv_agreement_carryout_view', schema: 'tm_dual'
     }
 }

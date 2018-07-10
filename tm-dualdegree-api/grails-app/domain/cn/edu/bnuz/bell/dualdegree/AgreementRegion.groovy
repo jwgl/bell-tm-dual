@@ -7,7 +7,7 @@ class AgreementRegion {
     /**
      *区域名称
      */
-    String        name
+    String name
 
     static mapping = {
         comment                 '合作大学所在区域，俗称项目'

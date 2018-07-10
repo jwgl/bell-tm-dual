@@ -31,8 +31,8 @@ order by d.name
      */
     def create(DeptAdministratorCommand cmd) {
         DepartmentAdministrator form = new DepartmentAdministrator(
-                department:         Department.load(cmd.departmentId),
-                teacher:            Teacher.load(cmd.teacherId)
+                department: Department.load(cmd.departmentId),
+                teacher: Teacher.load(cmd.teacherId)
         )
 
         form.save()
