@@ -259,10 +259,10 @@ order by form.datePaperApproved asc
         }
     }
 
-    def finish(String teacherId, Long id) {
-        DegreeApplication form = DegreeApplication.get(id)
+    def finish(String teacherId, FinishCommand cmd) {
+        DegreeApplication form = DegreeApplication.get(cmd.id)
 
-        if (!form) {
+        if (!form || !form.paperForm) {
             throw new NotFoundException()
         }
 
@@ -290,6 +290,7 @@ order by form.datePaperApproved asc
         if (form.award.betweenCheckDateRange()) {
             domainStateMachineHandler.finish(form, teacherId, workitem.id)
             form.datePaperApproved = new Date()
+            form.paperForm.comment = cmd.comment
             form.save()
         }
     }

@@ -7,8 +7,8 @@ class CooperativeUniversityCommand {
     String nameEn
     Integer regionId
 
-    List<Item>      addedItems
-    List<String>   removedItems
+    List<Item> addedItems
+    List<String> removedItems
 
     class Item {
         /**

@@ -38,7 +38,10 @@ class PaperApprovalController {
         def operation = Event.valueOf(op)
         switch (operation) {
             case Event.FINISH:
-                paperApprovalService.finish(mentorId, id)
+                def cmd = new FinishCommand()
+                bindData(cmd, request.JSON)
+                cmd.id = formId
+                paperApprovalService.finish(mentorId, cmd)
                 break
             case Event.REJECT:
                 def cmd = new RejectCommand()

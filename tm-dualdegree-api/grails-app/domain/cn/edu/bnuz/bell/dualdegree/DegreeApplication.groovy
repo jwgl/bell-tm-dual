@@ -51,7 +51,7 @@ class DegreeApplication implements StateObject {
     /**
      * 获得学位年份
      */
-    String bachelorYear
+    Integer bachelorYear
 
     /**
      * 创建日期
@@ -131,7 +131,7 @@ class DegreeApplication implements StateObject {
         dateApproved                     comment: '材料审批时间'
         workflowInstance                 comment: '工作流实例'
         paperForm                        comment: '论文互认表'
-        bachelorYear                     length: 4, comment: '获得学位年份'
+        bachelorYear                     comment: '获得学位年份'
     }
     static constraints = {
         dateSubmitted           nullable: true

@@ -27,6 +27,11 @@ class PaperForm {
      */
     String name
 
+    /**
+     * 导师评价
+     */
+    String comment
+
     static mapping = {
         comment               '论文互认表'
         table                 schema: 'tm_dual'
@@ -36,9 +41,11 @@ class PaperForm {
         englishTitle          length: 500, comment: '英文题目'
         name                  length: 255, comment: '互认课程名称'
         form                  comment: '关联表单'
+        comment                length: 1000, comment: '导师评价'
     }
 
     static constraints = {
         name                  nullable: true
+        comment                nullable: true
     }
 }

@@ -3,13 +3,13 @@ package cn.edu.bnuz.bell.dualdegree
 
 class AgreementCommand {
 
-    Long          id
-    String        agreementName
-    Integer       universityId
-    String        memo
+    Long id
+    String agreementName
+    Integer universityId
+    String memo
 
-    List<Item>      addedItems
-    List<Integer>   removedItems
+    List<Item> addedItems
+    List<Integer> removedItems
 
     class Item {
         /**
@@ -18,7 +18,7 @@ class AgreementCommand {
         String id
         Integer startedGrade
         Integer endedGrade
-        List<Integer>   coMajors
+        List<Integer> coMajors
     }
 
 }

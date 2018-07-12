@@ -4,7 +4,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 class AwardCommand {
-    Long   id
+    Long id
     String title
     String content
     String requestBegin

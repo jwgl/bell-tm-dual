@@ -49,7 +49,10 @@ class PaperMentorController {
                 paperMentorService.reject(checkerId, cmd, UUID.fromString(id))
                 break
             case Event.FINISH:
-                paperMentorService.finish(checkerId, id as Long)
+                def cmd = new FinishCommand()
+                bindData(cmd, request.JSON)
+                cmd.id = id as Long
+                paperMentorService.finish(checkerId, cmd)
                 break
             default:
                 throw new BadRequestException()

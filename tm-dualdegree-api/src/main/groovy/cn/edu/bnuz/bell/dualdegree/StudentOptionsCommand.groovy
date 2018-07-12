@@ -4,10 +4,10 @@ package cn.edu.bnuz.bell.dualdegree
  * 出国学生查询条件选项
  */
 class StudentOptionsCommand {
-    String  studentId
-    String  studentName
+    String studentId
+    String studentName
     Integer grade
-    String  sujectId
+    String sujectId
     Integer regionId
 
     def checkValue() {
