@@ -3,9 +3,6 @@ grails:
     profile: rest-api
     codegen:
         defaultPackage: cn.edu.bnuz.bell
-    spring:
-        transactionManagement:
-            proxies: false
     gorm:
         reactor:
             # Whether to translate GORM events into Reactor events
@@ -42,19 +39,19 @@ grails:
                         - Trident
         types:
             json:
-              - applicationForm/json
+              - application/json
               - text/json   
             hal:
-              - applicationForm/hal+json
-              - applicationForm/hal+xml
+              - application/hal+json
+              - application/hal+xml
             xml:
               - text/xml
-              - applicationForm/xml
-            atom: applicationForm/atom+xml
+              - application/xml
+            atom: application/atom+xml
             css: text/css
             csv: text/csv
             js: text/javascript
-            rss: applicationForm/rss+xml
+            rss: application/rss+xml
             text: text/plain
             all: '*/*'            
     urlmapping:
@@ -63,7 +60,7 @@ grails:
     controllers:
         defaultScope: singleton
         upload:
-            maxFileSize: 50000000
+            maxFileSize: 55000000
             maxRequestSize: 100000000
     converters:
         encoding: UTF-8
@@ -133,6 +130,8 @@ security:
     oauth2:
         resource:
             userInfoUri: http://localhost/uaa/user
+        client:
+            client-id: ${info.app.name}
 
 bell:
     orm:
@@ -145,3 +144,5 @@ bell:
                 - et
     student:
         filesPath: 'D:\temp\tm'
+    report:
+        service: tm-report

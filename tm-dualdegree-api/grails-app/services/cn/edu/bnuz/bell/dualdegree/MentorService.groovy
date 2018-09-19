@@ -86,4 +86,13 @@ where m.id = :id
         mentor.setEmail(cmd.email)
         mentor.save()
     }
+
+    def getPaperProvers() {
+        Mentor.executeQuery'''
+select new map(t.id as id, t.name as name)
+from Mentor m 
+join m.teacher t 
+where d.department.id = :department
+''', [department: securityService.departmentId]
+    }
 }

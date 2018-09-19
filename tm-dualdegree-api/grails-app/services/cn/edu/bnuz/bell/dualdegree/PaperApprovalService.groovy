@@ -182,8 +182,7 @@ from DegreeApplication form
 join form.award award
 join form.approver approver
 left join form.paperApprover paperApprover
-where current_date between award.requestBegin and award.approvalEnd
-and form.status = :status 
+where form.status = :status 
 and paperApprover.id = :teacherId
 and form.datePaperSubmitted < (select datePaperSubmitted from DegreeApplication where id = :id)
 order by form.datePaperSubmitted desc
@@ -192,7 +191,7 @@ order by form.datePaperSubmitted desc
                 return dataAccessService.getLong('''
 select form.id
 from DegreeApplication form
-where form.approver.id = :teacherId
+where form.paperApprover.id = :teacherId
 and form.datePaperApproved is not null
 and form.status <> :status
 and form.datePaperSubmitted < (select datePaperSubmitted from DegreeApplication where id = :id)
@@ -207,11 +206,9 @@ order by form.datePaperSubmitted desc
                 return dataAccessService.getLong('''
 select form.id
 from DegreeApplication form 
-join form.award award
 join form.approver approver
 left join form.paperApprover paperApprover
-where current_date between award.requestBegin and award.approvalEnd
-and form.status = :status 
+where form.status = :status 
 and paperApprover.id = :teacherId
 and form.datePaperSubmitted > (select datePaperSubmitted from DegreeApplication where id = :id)
 order by form.datePaperSubmitted asc
@@ -273,7 +270,6 @@ order by form.datePaperApproved asc
         if (!domainStateMachineHandler.canFinish(form)) {
             throw new BadRequestException()
         }
-
         def workitem = Workitem.findByInstanceAndActivityAndToAndDateProcessedIsNull(
                 WorkflowInstance.load(form.workflowInstanceId),
                 WorkflowActivity.load('dualdegree.application.approvePaper'),

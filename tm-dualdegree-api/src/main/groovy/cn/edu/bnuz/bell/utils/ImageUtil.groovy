@@ -1,4 +1,4 @@
-package cn.edu.bnuz.bell.dualdegree.utils
+package cn.edu.bnuz.bell.utils
 
 import cn.edu.bnuz.bell.http.ForbiddenException
 

@@ -53,7 +53,7 @@ class UrlMappings {
                 "/tousers"(controller: 'applicationCheck', action: 'tousers', method: 'GET')
                 "/workitems"(resources: 'applicationCheck', includes: ['show', 'patch'])
                 collection {
-                    "/mentors"(controller: 'mentor', action: 'index', method: 'GET')
+                    "/mentors"(controller: 'mentor', action: 'paperApprovers', method: 'GET')
                 }
             }
             "/papermentors"(resources: 'paperMentor') {
@@ -72,7 +72,14 @@ class UrlMappings {
             }
         }
 
-        "500"(view: '/error')
-        "404"(view: '/notFound')
+        "/picture"(resource: 'picture', includes: ['show']) {
+            collection {
+                "/fileview"(action: 'fileSource', method: 'GET')
+                "/filesrc"(action: 'fileSource', method: 'GET')
+                "/download"(action: 'download', method: 'GET')
+            }
+        }
+
+        "/report"(resource: 'applicationReport', includes: ['show'])
     }
 }

@@ -1,6 +1,6 @@
 package cn.edu.bnuz.bell.dualdegree
 
-import cn.edu.bnuz.bell.dualdegree.utils.ImageUtil
+import cn.edu.bnuz.bell.utils.ImageUtil
 import cn.edu.bnuz.bell.security.SecurityService
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus

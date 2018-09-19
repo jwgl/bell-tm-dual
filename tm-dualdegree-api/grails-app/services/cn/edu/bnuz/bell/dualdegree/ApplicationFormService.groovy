@@ -201,6 +201,17 @@ where form.id = :id
         } else {
             universities = getCooperativeUniversity(student)
         }
+        List<GroupCondition> conditions = [
+                new GroupCondition(
+                        groupBy: 'universityEn',
+                        into: 'subjects',
+                        mappings: [
+                                universityEn: 'universityEn',
+                                universityCn: 'universityCn'
+                        ]
+                )
+        ]
+
         return [
                 form: [],
                 timeNode: [
@@ -209,7 +220,7 @@ where form.id = :id
                         paperEnd: award.paperEnd,
                         approvalEnd: award.approvalEnd
                 ],
-                universities: universities,
+                universities: CollectionUtils.groupBy(universities, conditions),
                 fileNames: findFiles(userId, awardId)
         ]
     }
@@ -245,16 +256,23 @@ where form.id = :id
         form.save()
     }
 
-    private List<String> getCooperativeUniversity(String departmentId) {
+    private List getCooperativeUniversity(String departmentId) {
         CoUniversity.executeQuery'''
-select new map(c.name as universityEn)
-from CoUniversity c
-where c.department.id = :departmentId
+select new map(
+    u.nameEn as universityEn,
+    u.nameCn as universityCn,
+    cm.nameEn as majorEn,
+    cm.nameCn as majorCn,
+    cm.bachelor as bachelor
+)
+from CoUniversity cu, CooperativeUniversity u
+join u.cooperativeMajors cm 
+where cu.name = u.nameEn and cu.department.id = :departmentId
 ''', [departmentId: departmentId]
     }
 
-    private List<Map<String, String>> getCooperativeUniversity(Student student) {
-        def list =AgreementSubject.executeQuery'''
+    private List getCooperativeUniversity(Student student) {
+        AgreementSubject.executeQuery'''
 select distinct new map(
     u.nameEn as universityEn,
     u.nameCn as universityCn,
@@ -275,17 +293,6 @@ and st.id = :studentId
 and mj.subject = asj.subject
 and (mj.grade between asj.startedGrade -1 and asj.endedGrade)
 ''', [studentId: student.id]
-        List<GroupCondition> conditions = [
-                new GroupCondition(
-                        groupBy: 'universityEn',
-                        into: 'subjects',
-                        mappings: [
-                                universityEn: 'universityEn',
-                                universityCn: 'universityCn'
-                        ]
-                )
-        ]
-        CollectionUtils.groupBy(list, conditions)
     }
 
     Map<String, String> findFiles(String studentId, id) {

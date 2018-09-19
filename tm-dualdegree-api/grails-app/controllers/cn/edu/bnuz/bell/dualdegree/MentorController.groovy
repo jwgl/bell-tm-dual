@@ -38,4 +38,8 @@ class MentorController {
         mentorService.delete(id)
         renderOk()
     }
+
+    def paperApprovers(String departmentId) {
+        renderJson(mentorService.paperProvers)
+    }
 }

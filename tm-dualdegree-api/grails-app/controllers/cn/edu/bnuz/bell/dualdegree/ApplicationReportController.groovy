@@ -3,9 +3,7 @@ package cn.edu.bnuz.bell.dualdegree
 import cn.edu.bnuz.bell.http.BadRequestException
 import cn.edu.bnuz.bell.report.ReportClientService
 import cn.edu.bnuz.bell.report.ReportRequest
-import cn.edu.bnuz.bell.report.ReportResponse
 import cn.edu.bnuz.bell.security.SecurityService
-import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
 
 @PreAuthorize('hasAuthority("PERM_DUALDEGREE_DEPT_ADMIN")')
@@ -36,23 +34,11 @@ class ApplicationReportController {
             default:
                 throw new BadRequestException()
         }
-        report(new ReportRequest(
-                reportService: 'tm-report',
+        def reportRequest = new ReportRequest(
                 reportName: reportName,
                 format: format,
                 parameters: parameters
-        ))
-
-    }
-
-    private report(ReportRequest reportRequest) {
-        ReportResponse reportResponse = reportClientService.runAndRender(reportRequest)
-
-        if (reportResponse.statusCode == HttpStatus.OK) {
-            response.setHeader('Content-Disposition', reportResponse.contentDisposition)
-            response.outputStream << reportResponse.content
-        } else {
-            response.setStatus(reportResponse.statusCode.value())
-        }
+        )
+        reportClientService.runAndRender(reportRequest, response)
     }
 }
