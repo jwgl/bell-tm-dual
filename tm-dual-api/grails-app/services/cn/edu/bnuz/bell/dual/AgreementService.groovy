@@ -35,19 +35,20 @@ join subject.department department
 where agreement.name like :name
 and gr.name like :regionName
 and department.name like :departmentName
-and subject.name like :subjectName
+and subject.id = :subjectId
 and :grade between item.startedGrade and item.endedGrade
 and u.nameCn like :universityCn
 order by agreement.name
 '''
         if (!cmd.grade) queryStr = queryStr.replace('between item.startedGrade and item.endedGrade', '= 1')
+        if (!cmd.subjectId) queryStr = queryStr.replace('subject.id', '1')
         def results = Agreement.executeQuery queryStr,
                 [name: cmd.name ? "%${cmd.name}%" : '%',
                  regionName: cmd.regionName ?: '%',
                  departmentName: cmd.department ?: '%',
                  grade: cmd.grade ?: 1,
-                 subjectName: cmd.subjectName ?: '%',
-                 universityCn: cmd.universityCn ? "%${cmd.name}%" : '%']
+                 subjectId: cmd.subjectId ?: 1,
+                 universityCn: cmd.universityCn ? "%${cmd.universityCn}%" : '%']
         return [list: results, majors: this.subjects, regions: this.regions]
     }
 

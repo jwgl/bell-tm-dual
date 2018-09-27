@@ -11,9 +11,6 @@ class CooperativeUniversityCommand {
     List<String> removedItems
 
     class Item {
-        /**
-         * 英文缩写
-         */
         Long id
         String nameCn
         String nameEn

@@ -13,6 +13,7 @@ class AgreementController {
     def index() {
         def cmd = new AgreementFilterCommand()
         bindData(cmd, params)
+        println cmd.toString()
         renderJson(agreementService.list(cmd))
     }
 

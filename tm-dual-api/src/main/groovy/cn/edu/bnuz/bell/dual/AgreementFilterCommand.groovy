@@ -5,10 +5,10 @@ class AgreementFilterCommand {
     String regionName
     Integer grade
     String department
-    String subjectName
+    String subjectId
     String universityCn
 
     String toString() {
-        return "name: ${name}, regionName: ${regionName}, grade: ${grade}, department: ${department}, subjectName: ${subjectName}, universityCn: ${universityCn}"
+        return "name: ${name}, regionName: ${regionName}, grade: ${grade}, department: ${department}, subjectId: ${subjectId}, universityCn: ${universityCn}"
     }
 }

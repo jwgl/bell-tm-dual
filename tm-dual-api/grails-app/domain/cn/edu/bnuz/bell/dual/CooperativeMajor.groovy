@@ -30,7 +30,7 @@ class CooperativeMajor {
         shortName               length: 5, comment: '英文名缩写'
         nameEn                  length: 100, comment: '英文名称'
         nameCn                  length: 100, comment: '中文名称'
-        bachelor                length: 50, comment: '所获得学位'
+        bachelor                length: 100, comment: '所获得学位'
     }
 
     static constraints = {

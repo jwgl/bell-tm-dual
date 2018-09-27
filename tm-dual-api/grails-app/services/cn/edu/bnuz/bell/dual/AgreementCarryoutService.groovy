@@ -12,7 +12,7 @@ class AgreementCarryoutService {
         AgreementCarryoutView.executeQuery'''
 select new map(
     subjectId as subjectId,
-    subjectName as subjectName,
+    subjectName as subjectId,
     regionName as regionName,
     grade as grade,
     majorId as majorId
