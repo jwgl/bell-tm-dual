@@ -1,4 +1,3 @@
-rootProject.name='bell-tm-dualdegree'
+rootProject.name='bell-tm-dual'
 
-include 'tm-dualdegree-api'
-include 'tm-dualdegree-web'
+include 'tm-dual-api'
