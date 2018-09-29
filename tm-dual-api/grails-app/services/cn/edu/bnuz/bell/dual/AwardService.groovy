@@ -17,8 +17,8 @@ select new map(
     ba.title as title,
     ba.requestBegin as requestBegin,
     ba.requestEnd as requestEnd,
-    ba.paperEnd as paperEnd,
-    ba.approvalEnd as approvalEnd,
+    (case when ba.paperEnd > ba.requestEnd then ba.paperEnd else null end) as paperEnd,
+    (case when ba.approvalEnd > ba.requestEnd then ba.approvalEnd else null end) as approvalEnd,
     ba.creator as creator,
     ba.dateCreated as dateCreated,
     ba.department.name as departmentName

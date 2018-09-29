@@ -8,6 +8,7 @@ import org.springframework.security.access.prepost.PreAuthorize
 @PreAuthorize('hasRole("ROLE_DUALDEGREE_STUDENT")')
 class ApplicationFormController {
     ApplicationFormService applicationFormService
+    AwardPublicService awardPublicService
     ApplicationReviewerService applicationReviewerService
     PaperFormService paperFormService
 
@@ -53,7 +54,7 @@ class ApplicationFormController {
         def form = applicationFormService.getFormForShow(studentId, id)
         renderJson ([
                         form: form,
-                        award: applicationFormService.getAward((Long)form.awardId),
+                        award: awardPublicService.getAwardInfo((Long)form.awardId),
                         fileNames: applicationFormService.findFiles(studentId, form.awardId),
                         paperForm: paperFormService.getPaperForm(studentId, id)
         ])

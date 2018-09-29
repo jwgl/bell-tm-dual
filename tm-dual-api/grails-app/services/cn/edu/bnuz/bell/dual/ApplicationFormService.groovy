@@ -28,7 +28,6 @@ class ApplicationFormService {
      * @return 已申请过的授予通知和申请状态、正在开放的授予通知
      */
     def list(String userId) {
-
         DegreeApplication.executeQuery'''
 select new map(
     da.id as applicationId,
@@ -36,8 +35,8 @@ select new map(
     ba.title as title,
     ba.requestBegin as requestBegin,
     ba.requestEnd as requestEnd,
-    ba.paperEnd as paperEnd,
-    ba.approvalEnd as approvalEnd,
+    (case when ba.paperEnd > ba.requestEnd then ba.paperEnd else null end) as paperEnd,
+    (case when ba.approvalEnd > ba.requestEnd then ba.approvalEnd else null end) as approvalEnd,
     ba.creator as creator,
     ba.dateCreated as dateCreated,
     ba.department.name as departmentName,
@@ -318,10 +317,6 @@ and (mj.grade between asj.startedGrade -1 and asj.endedGrade)
 
         }
         return fileNames
-    }
-
-    def getAward(Long awardId) {
-        Award.get(awardId)
     }
 
     def getUser(Long id) {
