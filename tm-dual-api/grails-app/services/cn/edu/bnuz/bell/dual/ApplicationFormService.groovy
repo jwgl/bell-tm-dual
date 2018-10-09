@@ -332,4 +332,13 @@ join da.student s
 where da.id = :id
 ''', [id: id]
     }
+
+    def getLatestAward() {
+        def result = Award.executeQuery('''
+select a.id from Award a
+join a.department d
+where d.id = :departmentId
+order by a.dateCreated desc''', [departmentId: securityService.departmentId], [max: 1])
+        return result ? result[0] : null
+    }
 }
