@@ -268,6 +268,7 @@ select new map(
 from CoUniversity cu, CooperativeUniversity u
 join u.cooperativeMajors cm 
 where cu.name = u.nameEn and cu.department.id = :departmentId
+order by u.nameEn, cm.nameEn 
 ''', [departmentId: departmentId]
     }
 
@@ -292,6 +293,7 @@ where u.region.id = sa.agreementRegion.id
 and st.id = :studentId 
 and mj.subject = asj.subject
 and (mj.grade between asj.startedGrade -1 and asj.endedGrade)
+order by u.nameEn, cm.nameEn 
 ''', [studentId: student.id]
     }
 
