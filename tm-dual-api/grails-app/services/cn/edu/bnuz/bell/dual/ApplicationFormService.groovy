@@ -256,7 +256,7 @@ where form.id = :id
 
     private List getCooperativeUniversity(String departmentId) {
         CoUniversity.executeQuery'''
-select new map(
+select distinct new map(
     u.nameEn as universityEn,
     u.nameCn as universityCn,
     cm.nameEn as majorEn,

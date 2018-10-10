@@ -226,6 +226,7 @@ select new map(
 from AgreementCooperativeMajor acm 
 join acm.cooperativeMajor cm
 where acm.agreementMajor.id = :id
+order by cm.nameEn
 ''', [id: itemId]
     }
 
