@@ -79,11 +79,12 @@ join form.student student
 join student.adminClass adminClass
 join form.approver approver
 join form.paperApprover paperApprover
-where approver.id = :teacherId 
+where form.award.id = :award
+and approver.id = :teacherId 
 and paperApprover.id is not null
 and form.status <> :status
 order by form.datePaperApproved desc
-''', [teacherId: teacherId, status: State.STEP3], args
+''', [award: applicationFormService.latestAward, teacherId: teacherId, status: State.STEP3], args
     }
 
     def countTodoList(String teacherId) {
@@ -105,10 +106,11 @@ select count(*)
 from DegreeApplication form 
 join form.approver approver
 join form.paperApprover paperApprover
-where form.status <> :status
+where form.award.id = :award
+and form.status <> :status
 and approver.id = :teacherId
 and paperApprover.id is not null
-''', [teacherId: teacherId, status: State.STEP3]
+''', [award: applicationFormService.latestAward, teacherId: teacherId, status: State.STEP3]
     }
 
     def getCounts(String teacherId) {

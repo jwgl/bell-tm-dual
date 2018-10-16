@@ -256,7 +256,7 @@ where form.id = :id
 
     private List getCooperativeUniversity(String departmentId) {
         CoUniversity.executeQuery'''
-select new map(
+select distinct new map(
     u.nameEn as universityEn,
     u.nameCn as universityCn,
     cm.nameEn as majorEn,
@@ -266,6 +266,7 @@ select new map(
 from CoUniversity cu, CooperativeUniversity u
 join u.cooperativeMajors cm 
 where cu.name = u.nameEn and cu.department.id = :departmentId
+order by u.nameEn, cm.nameEn 
 ''', [departmentId: departmentId]
     }
 
@@ -290,6 +291,7 @@ where u.region.id = sa.agreementRegion.id
 and st.id = :studentId 
 and mj.subject = asj.subject
 and (mj.grade between asj.startedGrade -1 and asj.endedGrade)
+order by u.nameEn, cm.nameEn 
 ''', [studentId: student.id]
     }
 
@@ -325,5 +327,14 @@ from DegreeApplication da
 join da.student s
 where da.id = :id
 ''', [id: id]
+    }
+
+    def getLatestAward() {
+        def result = Award.executeQuery('''
+select a.id from Award a
+join a.department d
+where d.id = :departmentId
+order by a.dateCreated desc''', [departmentId: securityService.departmentId], [max: 1])
+        return result ? result[0] : null
     }
 }

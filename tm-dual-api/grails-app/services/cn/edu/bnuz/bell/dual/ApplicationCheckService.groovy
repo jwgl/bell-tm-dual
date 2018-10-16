@@ -74,10 +74,11 @@ join form.student student
 join student.adminClass adminClass
 left join form.paperApprover paperApprover
 where form.approver.id = :teacherId
+and form.award.id = :award
 and form.dateApproved is not null
 and form.status <> :status
 order by form.dateApproved desc
-''', [teacherId: teacherId, status: State.STEP1], args
+''', [award: applicationFormService.latestAward, teacherId: teacherId, status: State.STEP1], args
 
         return [forms: forms, counts: getCounts(teacherId)]
     }
@@ -97,10 +98,11 @@ and form.approver.id = :teacherId
         dataAccessService.getLong '''
 select count(*)
 from DegreeApplication form
-where form.status <> :status
+where form.award.id = :award
+and form.status <> :status
 and form.dateApproved is not null
 and form.approver.id = :teacherId
-''', [teacherId: teacherId, status: State.STEP1]
+''', [award: applicationFormService.latestAward, teacherId: teacherId, status: State.STEP1]
     }
 
     def getCounts(String teacherId) {
