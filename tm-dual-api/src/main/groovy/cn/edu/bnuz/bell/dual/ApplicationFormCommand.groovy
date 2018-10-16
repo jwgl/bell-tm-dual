@@ -8,5 +8,6 @@ class ApplicationFormCommand {
     String linkman
     String phone
     Long awardId
+    String bachelor
     Integer bachelorYear
 }
