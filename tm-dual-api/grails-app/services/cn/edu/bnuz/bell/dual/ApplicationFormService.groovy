@@ -79,6 +79,7 @@ and ba.department.id = :departmentId
                 linkman: cmd.linkman,
                 phone: cmd.phone,
                 dateModified: now,
+                bachelor: cmd.bachelor,
                 bachelorYear: cmd.bachelorYear,
                 status: domainStateMachineHandler.initialState
         )
@@ -112,6 +113,7 @@ and ba.department.id = :departmentId
         form.setLinkman(cmd.linkman)
         form.setPhone(cmd.phone)
         form.setDateModified(now)
+        form.setBachelor(cmd.bachelor)
         form.setBachelorYear(cmd.bachelorYear)
 
         if (!form.save()) {
@@ -143,6 +145,7 @@ select new map(
   form.dateCreated as dateCreated,
   form.dateModified as dateModified,
   form.dateSubmitted as dateSubmitted,
+  form.bachelor as bachelor,
   form.bachelorYear as bachelorYear,
   approver.id as approverId,
   approver.name as approver,

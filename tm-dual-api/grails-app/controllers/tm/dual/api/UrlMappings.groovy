@@ -21,7 +21,9 @@ class UrlMappings {
         }
 
         group "/admin", {
-            "/applications"(resources: 'applicationFinder')
+            "/applications"(resources: 'applicationFinder') {
+                "/report"(controller: 'applicationFinder', action: 'export', method: 'GET')
+            }
         }
 
         "/departments"(resources: 'department', includes: []) {

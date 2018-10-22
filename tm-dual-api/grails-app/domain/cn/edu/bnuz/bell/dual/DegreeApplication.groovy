@@ -49,6 +49,11 @@ class DegreeApplication implements StateObject {
     String majorCooperative
 
     /**
+     * 获得学位
+     */
+    String bachelor
+
+    /**
      * 获得学位年份
      */
     Integer bachelorYear
@@ -119,6 +124,7 @@ class DegreeApplication implements StateObject {
         email                            length: 50, comment: '邮件'
         universityCooperative            length: 100, comment: '合作大学'
         majorCooperative                 length: 100, comment: '国外专业'
+        bachelor                         length: 50, comment: '获得国外学位'
         dateCreated                      comment: '填表的日期'
         status                           sqlType: 'tm.state', type: StateUserType, comment: '状态'
         dateCreated                      comment: '创建时间'
@@ -142,6 +148,7 @@ class DegreeApplication implements StateObject {
         dateApproved            nullable: true
         workflowInstance        nullable: true
         paperForm               nullable: true
+        bachelor                nullable: true
         bachelorYear            nullable: true
     }
 

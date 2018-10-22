@@ -35,6 +35,31 @@ order by form.dateSubmitted, student.id
 ''', [q: q]
     }
 
+    def findFinishedByYear(Integer year) {
+
+        DegreeApplication.executeQuery '''
+select new map(
+  form.id as id,
+  student.id as studentId,
+  student.name as studentName,
+  student.sex as sex,
+  adminClass.name as className,
+  form.dateSubmitted as date,
+  paperApprover.name as paperApprover,
+  form.status as status
+)
+from DegreeApplication form
+join form.award award
+join form.student student
+join student.adminClass adminClass
+join student.department department
+left join form.paperApprover paperApprover
+where form.status = 'FINISHED'
+and award.requestBegin between to_date(to_char(:year - 1, '9999') || '-08-01', 'YYYY-MM-DD') and to_date(to_char(:year, '9999') || '-07-30', 'YYYY-MM-DD')
+order by form.dateSubmitted, student.id
+''', [year: year]
+    }
+
     def getFormForReview(Long id) {
         def form = applicationFormService.getFormInfo(id)
         if (!form) {
