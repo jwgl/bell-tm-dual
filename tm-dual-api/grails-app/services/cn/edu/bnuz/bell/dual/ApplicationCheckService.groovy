@@ -47,12 +47,11 @@ select new map(
 from DegreeApplication form
 join form.student student
 join student.adminClass adminClass
-join form.award award
 where form.approver.id = :teacherId
-and current_date between award.requestBegin and award.approvalEnd
+and form.award.id = :award
 and form.status = :status
 order by form.dateSubmitted
-''', [teacherId: teacherId, status: State.STEP1], args
+''', [award: applicationFormService.latestAward, teacherId: teacherId, status: State.STEP1], args
 
         return [forms: forms, counts: getCounts(teacherId)]
     }
@@ -87,11 +86,10 @@ order by form.dateApproved desc
         dataAccessService.getLong '''
 select count(*)
 from DegreeApplication form 
-join form.award award
-where current_date between award.requestBegin and award.approvalEnd
+where form.award.id = :award
 and form.status = :status
 and form.approver.id = :teacherId
-''', [teacherId: teacherId, status: State.STEP1]
+''', [award: applicationFormService.latestAward, teacherId: teacherId, status: State.STEP1]
     }
 
     def countDoneList(String teacherId) {
@@ -156,23 +154,23 @@ and form.approver.id = :teacherId
                 return dataAccessService.getLong('''
 select form.id
 from DegreeApplication form 
-join form.award award
-where current_date between award.requestBegin and award.approvalEnd
+where form.award.id = :award
 and form.status = :status
 and form.approver.id = :teacherId
 and form.dateSubmitted < (select dateSubmitted from DegreeApplication where id = :id)
 order by form.dateSubmitted desc
-''', [teacherId: teacherId, id: id, status: State.STEP1])
+''', [award: applicationFormService.latestAward, teacherId: teacherId, id: id, status: State.STEP1])
             case ListType.DONE:
                 return dataAccessService.getLong('''
 select form.id
 from DegreeApplication form
 where form.approver.id = :teacherId
+and form.award.id = :award
 and form.dateApproved is not null
 and form.status = :status
 and form.dateApproved > (select dateApproved from DegreeApplication where id = :id)
 order by form.dateApproved asc
-''', [teacherId: teacherId, id: id, status: State.STEP2])
+''', [award: applicationFormService.latestAward, teacherId: teacherId, id: id, status: State.STEP2])
         }
     }
 
@@ -182,23 +180,23 @@ order by form.dateApproved asc
                 return dataAccessService.getLong('''
 select form.id
 from DegreeApplication form 
-join form.award award
-where current_date between award.requestBegin and award.approvalEnd
+where form.award.id = :award
 and form.status = :status
 and form.approver.id = :teacherId
 and form.dateSubmitted > (select dateSubmitted from DegreeApplication where id = :id)
 order by form.dateSubmitted asc
-''', [teacherId: teacherId, id: id, status: State.STEP1])
+''', [award: applicationFormService.latestAward, teacherId: teacherId, id: id, status: State.STEP1])
             case ListType.DONE:
                 return dataAccessService.getLong('''
 select form.id
 from DegreeApplication form
-where form.approver.id = :teacherId
+where form.award.id = :award
+and form.approver.id = :teacherId
 and form.dateApproved is not null
 and form.status = :status
 and form.dateApproved < (select dateApproved from DegreeApplication where id = :id)
 order by form.dateApproved desc
-''', [teacherId: teacherId, id: id, status: State.STEP2])
+''', [award: applicationFormService.latestAward, teacherId: teacherId, id: id, status: State.STEP2])
         }
     }
 
