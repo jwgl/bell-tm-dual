@@ -244,17 +244,15 @@ where d.id = :department
 
     void next(String userId, AcceptCommand cmd, UUID workitemId) {
         DegreeApplication form = DegreeApplication.get(cmd.id)
-        if (form.award.betweenCheckDateRange()) {
-            domainStateMachineHandler.next(form, userId, 'approvePaper', cmd.comment, workitemId, cmd.to)
-            form.paperApprover = Teacher.load(cmd.to)
-            form.save()
-        }
+        domainStateMachineHandler.next(form, userId, 'approvePaper', cmd.comment, workitemId, cmd.to)
+        form.paperApprover = Teacher.load(cmd.to)
+        form.save()
     }
 
     def setMentor(String userId, PaperMentorCommand cmd) {
         cmd.ids.each { id ->
             def form = DegreeApplication.get(id)
-            if (form && form.award.betweenCheckDateRange()) {
+            if (form) {
                 def workitem = Workitem.findByInstanceAndActivityAndToAndDateProcessedIsNull(
                         WorkflowInstance.load(form.workflowInstanceId),
                         WorkflowActivity.load("${DegreeApplication.WORKFLOW_ID}.checkPaper"),
@@ -273,11 +271,9 @@ where d.id = :department
         if (form.approver.id != teacherId) {
             throw new BadRequestException()
         }
-        if (form.award.betweenCheckDateRange()) {
-            domainStateMachineHandler.reject(form, teacherId, 'checkPaper', cmd.comment, id)
-            form.paperApprover = null
-            form.save()
-        }
+        domainStateMachineHandler.reject(form, teacherId, 'checkPaper', cmd.comment, id)
+        form.paperApprover = null
+        form.save()
     }
 
     def finish(String teacherId, FinishCommand cmd) {
@@ -301,11 +297,9 @@ where d.id = :department
                 User.load(teacherId),
         )
 
-        if (form.award.betweenCheckDateRange()) {
-            domainStateMachineHandler.finish(form, teacherId, workitem.id)
-            form.datePaperApproved = new Date()
-            form.paperForm.comment = cmd.comment
-            form.save()
-        }
+        domainStateMachineHandler.finish(form, teacherId, workitem.id)
+        form.datePaperApproved = new Date()
+        form.paperForm.comment = cmd.comment
+        form.save()
     }
 }

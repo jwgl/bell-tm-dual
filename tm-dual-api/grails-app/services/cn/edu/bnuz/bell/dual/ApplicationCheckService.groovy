@@ -167,10 +167,10 @@ from DegreeApplication form
 where form.approver.id = :teacherId
 and form.award.id = :award
 and form.dateApproved is not null
-and form.status = :status
+and form.status <> :status
 and form.dateApproved > (select dateApproved from DegreeApplication where id = :id)
 order by form.dateApproved asc
-''', [award: applicationFormService.latestAward, teacherId: teacherId, id: id, status: State.STEP2])
+''', [award: applicationFormService.latestAward, teacherId: teacherId, id: id, status: State.STEP1])
         }
     }
 
@@ -193,37 +193,31 @@ from DegreeApplication form
 where form.award.id = :award
 and form.approver.id = :teacherId
 and form.dateApproved is not null
-and form.status = :status
+and form.status <> :status
 and form.dateApproved < (select dateApproved from DegreeApplication where id = :id)
 order by form.dateApproved desc
-''', [award: applicationFormService.latestAward, teacherId: teacherId, id: id, status: State.STEP2])
+''', [award: applicationFormService.latestAward, teacherId: teacherId, id: id, status: State.STEP1])
         }
     }
 
     void next(String userId, AcceptCommand cmd, UUID workitemId) {
         DegreeApplication form = DegreeApplication.get(cmd.id)
-        if (form.award.betweenCheckDateRange()) {
-            domainStateMachineHandler.next(form, userId, Activities.CHECK, cmd.comment, workitemId, cmd.to)
-            form.dateApproved = new Date()
-            form.save()
-        }
+        domainStateMachineHandler.next(form, userId, Activities.CHECK, cmd.comment, workitemId, cmd.to)
+        form.dateApproved = new Date()
+        form.save()
     }
 
     void reject(String userId, RejectCommand cmd, UUID workitemId) {
         DegreeApplication form = DegreeApplication.get(cmd.id)
-        if (form.award.betweenCheckDateRange()) {
-            domainStateMachineHandler.reject(form, userId, Activities.CHECK, cmd.comment, workitemId)
-            form.dateApproved = new Date()
-            form.save()
-        }
+        domainStateMachineHandler.reject(form, userId, Activities.CHECK, cmd.comment, workitemId)
+        form.dateApproved = new Date()
+        form.save()
     }
 
     void setPaperApprover(Long id, String teacherId) {
         def form = DegreeApplication.load(id)
-        if (form.award.betweenCheckDateRange()) {
-            form.setPaperApprover(Teacher.load(teacherId))
-            form.save()
-        }
+        form.setPaperApprover(Teacher.load(teacherId))
+        form.save()
     }
 
     def tousers(Long id) {
