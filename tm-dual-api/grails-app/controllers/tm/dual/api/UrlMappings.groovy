@@ -11,7 +11,7 @@ class UrlMappings {
                 }
             }
             "/universities"(resources: 'cooperativeUniversity')
-            "/carryout"(resources: 'agreementCarryout')
+            "/carryouts"(resources: 'agreementCarryout')
         }
 
         "/agreements"(resources: 'agreementPublic', includes: ['index', 'show'])
