@@ -21,7 +21,7 @@ select new map(
     t.name as teacherName,
     t.sex as sex,
     t.academicTitle as academicTitle,
-    t.academicDegree as academicDegree,
+    m.vChatId as vChatId,
     m.email as email,
     d.name as departmentName
 )
@@ -41,6 +41,7 @@ where d.id = :department
         Mentor mentor = new Mentor(
                 teacher: Teacher.load(cmd.teacherId),
                 email: cmd.email,
+                vChatId: cmd.vChatId,
                 department: Department.load(securityService.departmentId)
         )
         mentor.save()
@@ -58,6 +59,7 @@ select new map(
     m.id as id,
     t.id as teacherId,
     t.name as teacherName,
+    m.vChatId as vChatId,
     m.email as email
 )
 from Mentor m 
@@ -84,6 +86,7 @@ where m.id = :id
     def update(Long id, MentorCommand cmd) {
         Mentor mentor = Mentor.get(id)
         mentor.setEmail(cmd.email)
+        mentor.setvChatId(cmd.vChatId)
         mentor.save()
     }
 

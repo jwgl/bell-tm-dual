@@ -20,6 +20,11 @@ class Mentor {
      */
     String email
 
+    /**
+     * 微信号
+     */
+    String vChatId
+
     static mapping = {
         comment     '论文指导老师'
         table       schema: 'tm_dual'
@@ -27,9 +32,11 @@ class Mentor {
         department  comment: '聘用部门'
         teacher     comment: '教师'
         email       comment: '邮件地址'
+        vChatId     length: 50, comment: '微信号'
     }
 
     static constraints = {
         teacher     unique: 'department'
+        vChatId     nullable: true
     }
 }

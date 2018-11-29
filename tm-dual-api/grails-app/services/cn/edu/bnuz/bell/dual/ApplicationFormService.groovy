@@ -167,9 +167,11 @@ where form.id = :id
         }
         def form = results[0]
         if (form.paperApproverId) {
-            form['mentorEmail'] = Mentor.findByTeacherAndDepartment(
+            def mentor = Mentor.findByTeacherAndDepartment(
                     Teacher.load(form.paperApproverId),
-                    Department.load(securityService.departmentId))?.email
+                    Department.load(securityService.departmentId))
+            form['mentorEmail'] = mentor?.email
+            form['mentorVchatId'] = mentor?.vChatId
         }
 
         return form
