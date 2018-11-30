@@ -10,6 +10,7 @@ import cn.edu.bnuz.bell.security.SecurityService
 import cn.edu.bnuz.bell.utils.CollectionUtils
 import cn.edu.bnuz.bell.utils.GroupCondition
 import cn.edu.bnuz.bell.workflow.DomainStateMachineHandler
+import cn.edu.bnuz.bell.workflow.Workitem
 import cn.edu.bnuz.bell.workflow.commands.SubmitCommand
 import grails.gorm.transactions.Transactional
 import org.springframework.beans.factory.annotation.Value
@@ -340,6 +341,13 @@ select a.id from Award a
 join a.department d
 where d.id = :departmentId
 order by a.dateCreated desc''', [departmentId: securityService.departmentId], [max: 1])
+        return result ? result[0] : null
+    }
+
+    def getLatestAnswer(Long id) {
+        def result = Workitem.executeQuery '''
+select note from Workitem where instance = :instance and to.id = :userId order by dateCreated desc
+''', [instance: DegreeApplication.load(id).workflowInstance, userId: securityService.userId], [max: 1]
         return result ? result[0] : null
     }
 }

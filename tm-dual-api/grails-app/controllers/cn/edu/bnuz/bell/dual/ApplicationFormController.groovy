@@ -56,7 +56,8 @@ class ApplicationFormController {
                         form: form,
                         award: awardPublicService.getAwardInfo((Long)form.awardId),
                         fileNames: applicationFormService.findFiles(studentId, form.awardId),
-                        paperForm: paperFormService.getPaperForm(studentId, id)
+                        paperForm: paperFormService.getPaperForm(studentId, id),
+                        latestAnswer: applicationFormService.getLatestAnswer(id)
         ])
     }
 

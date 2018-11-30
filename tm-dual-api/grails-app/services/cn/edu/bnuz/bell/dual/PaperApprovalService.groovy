@@ -274,13 +274,13 @@ order by form.datePaperApproved asc
         }
         def workitem = Workitem.findByInstanceAndActivityAndToAndDateProcessedIsNull(
                 WorkflowInstance.load(form.workflowInstanceId),
-                WorkflowActivity.load('dual.application.approvePaper'),
+                WorkflowActivity.load("${DegreeApplication.WORKFLOW_ID}.approvePaper"),
                 User.load(teacherId),
         )
         if (!workitem) {
             workitem = Workitem.findByInstanceAndActivityAndToAndDateProcessedIsNull(
                     WorkflowInstance.load(form.workflowInstanceId),
-                    WorkflowActivity.load('dual.application.checkPaper'),
+                    WorkflowActivity.load("${DegreeApplication.WORKFLOW_ID}.checkPaper"),
                     User.load(teacherId),
             )
         }
