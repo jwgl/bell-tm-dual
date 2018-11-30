@@ -115,7 +115,7 @@ and form.approver.id = :teacherId
 
         def workitem = Workitem.findByInstanceAndActivityAndToAndDateProcessedIsNull(
                 WorkflowInstance.load(form.workflowInstanceId),
-                WorkflowActivity.load("${DegreeApplication.WORKFLOW_ID}.${Activities.CHECK}"),
+                WorkflowActivity.load("${DegreeApplication.WORKFLOW_ID}.checkPaper"),
                 User.load(teacherId),
         )
         domainStateMachineHandler.checkReviewer(id, teacherId, Activities.CHECK)
