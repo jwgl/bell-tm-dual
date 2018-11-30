@@ -2,6 +2,7 @@ package cn.edu.bnuz.bell.dual
 
 import cn.edu.bnuz.bell.security.User
 import cn.edu.bnuz.bell.workflow.DomainStateMachineHandler
+import cn.edu.bnuz.bell.workflow.State
 import cn.edu.bnuz.bell.workflow.WorkflowActivity
 import cn.edu.bnuz.bell.workflow.WorkflowInstance
 import cn.edu.bnuz.bell.workflow.Workitem
@@ -82,8 +83,10 @@ where da.id = :id and da.student.id = :studentId
                     User.load(userId),
             )
         }
-        domainStateMachineHandler.next(form, userId, 'submitPaper', cmd.comment, workitem.id, cmd.to)
-        form.datePaperSubmitted = new Date()
-        form.save()
+        if ((form.status == State.STEP2 || form.status == State.STEP5) && workitem.to.id == userId) {
+            domainStateMachineHandler.next(form, userId, 'submitPaper', cmd.comment, workitem.id, cmd.to)
+            form.datePaperSubmitted = new Date()
+            form.save()
+        }
     }
 }

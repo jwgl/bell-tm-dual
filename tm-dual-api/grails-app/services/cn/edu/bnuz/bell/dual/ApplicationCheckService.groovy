@@ -115,7 +115,7 @@ and form.approver.id = :teacherId
 
         def workitem = Workitem.findByInstanceAndActivityAndToAndDateProcessedIsNull(
                 WorkflowInstance.load(form.workflowInstanceId),
-                WorkflowActivity.load("${DegreeApplication.WORKFLOW_ID}.checkPaper"),
+                WorkflowActivity.load("${DegreeApplication.WORKFLOW_ID}.${Activities.CHECK}"),
                 User.load(teacherId),
         )
         domainStateMachineHandler.checkReviewer(id, teacherId, Activities.CHECK)
@@ -202,9 +202,13 @@ order by form.dateApproved desc
 
     void next(String userId, AcceptCommand cmd, UUID workitemId) {
         DegreeApplication form = DegreeApplication.get(cmd.id)
-        domainStateMachineHandler.next(form, userId, Activities.CHECK, cmd.comment, workitemId, cmd.to)
-        form.dateApproved = new Date()
-        form.save()
+        // 判断是否允许下一步
+        Workitem workitem = Workitem.load(workitemId)
+        if (form.status == State.STEP1 && workitem.to.id == userId && workitem.state == State.STEP1) {
+            domainStateMachineHandler.next(form, userId, Activities.CHECK, cmd.comment, workitemId, cmd.to)
+            form.dateApproved = new Date()
+            form.save()
+        }
     }
 
     void reject(String userId, RejectCommand cmd, UUID workitemId) {

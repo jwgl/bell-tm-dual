@@ -244,9 +244,13 @@ where d.id = :department
 
     void next(String userId, AcceptCommand cmd, UUID workitemId) {
         DegreeApplication form = DegreeApplication.get(cmd.id)
-        domainStateMachineHandler.next(form, userId, 'approvePaper', cmd.comment, workitemId, cmd.to)
-        form.paperApprover = Teacher.load(cmd.to)
-        form.save()
+        // 判断是否允许下一步
+        Workitem workitem = Workitem.load(workitemId)
+        if (form.status == State.STEP3 && workitem.to.id == userId) {
+            domainStateMachineHandler.next(form, userId, 'approvePaper', cmd.comment, workitemId, cmd.to)
+            form.paperApprover = Teacher.load(cmd.to)
+            form.save()
+        }
     }
 
     def setMentor(String userId, PaperMentorCommand cmd) {
@@ -293,7 +297,7 @@ where d.id = :department
 
         def workitem = Workitem.findByInstanceAndActivityAndToAndDateProcessedIsNull(
                 WorkflowInstance.load(form.workflowInstanceId),
-                WorkflowActivity.load('dual.application.checkPaper'),
+                WorkflowActivity.load("${DegreeApplication.WORKFLOW_ID}.checkPaper"),
                 User.load(teacherId),
         )
 
