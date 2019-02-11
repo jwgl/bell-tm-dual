@@ -1,9 +1,13 @@
 package cn.edu.bnuz.bell.dual
 
+import cn.edu.bnuz.bell.http.ForbiddenException
 import cn.edu.bnuz.bell.workflow.Event
+import cn.edu.bnuz.bell.workflow.State
 import cn.edu.bnuz.bell.workflow.commands.SubmitCommand
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.access.prepost.PreAuthorize
+
+import java.time.LocalDate
 
 @PreAuthorize('hasRole("ROLE_DUALDEGREE_STUDENT")')
 class ApplicationFormController {
@@ -53,11 +57,11 @@ class ApplicationFormController {
     def show(String studentId, Long id) {
         def form = applicationFormService.getFormForShow(studentId, id)
         renderJson ([
-                        form: form,
-                        award: awardPublicService.getAwardInfo((Long)form.awardId),
-                        fileNames: applicationFormService.findFiles(studentId, form.awardId),
-                        paperForm: paperFormService.getPaperForm(studentId, id),
-                        latestAnswer: applicationFormService.getLatestAnswer(id)
+                form: form,
+                award: awardPublicService.getAwardInfo((Long)form.awardId),
+                fileNames: applicationFormService.findFiles(studentId, form.awardId),
+                paperForm: paperFormService.getPaperForm(studentId, id),
+                latestAnswer: applicationFormService.getLatestAnswer(id)
         ])
     }
 
@@ -83,6 +87,11 @@ class ApplicationFormController {
     }
 
     def patch(String studentId, Long id, String op) {
+        // 如果预期，不做任何操作
+        def application = DegreeApplication.load(id)
+        if (isExpire(application)) {
+            throw new ForbiddenException()
+        }
         def operation = Event.valueOf(op)
         switch (operation) {
             case Event.SUBMIT:
@@ -130,7 +139,7 @@ class ApplicationFormController {
                         def names = dir.list().join(";")
                         def frequence = (names=~"bak_${prefix}")
                         def name = "${filePath}/bak_${prefix}_${frequence.size() + 1}" +
-                                    ".${f.name.substring(f.name.lastIndexOf(".") + 1).toLowerCase()}"
+                                ".${f.name.substring(f.name.lastIndexOf(".") + 1).toLowerCase()}"
                         f.renameTo(name)
                     }
                 }
@@ -143,5 +152,12 @@ class ApplicationFormController {
             renderBadRequest()
         }
 
+    }
+
+    private static Boolean isExpire(DegreeApplication application) {
+        def now = LocalDate.now()
+        if (application.status == State.CREATED && now.isAfter(application.award.requestEnd)) {
+            return true
+        }
     }
 }

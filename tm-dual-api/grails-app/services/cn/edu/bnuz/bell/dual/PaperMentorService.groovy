@@ -235,11 +235,12 @@ select new map(
     t.id as id,
     t.name as name
 )
-from Mentor m 
+from Mentor m
 join m.teacher t 
 join m.department d
 where d.id = :department
-''', [department: securityService.departmentId]
+and t not in (select distinct paperApprover from DegreeApplication where award.id = :award and paperApprover is not null)
+''', [department: securityService.departmentId, award: applicationFormService.latestAward]
     }
 
     void next(String userId, AcceptCommand cmd, UUID workitemId) {
