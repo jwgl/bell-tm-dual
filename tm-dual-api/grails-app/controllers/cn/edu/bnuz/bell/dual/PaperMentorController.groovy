@@ -6,6 +6,7 @@ import cn.edu.bnuz.bell.workflow.ListCommand
 import cn.edu.bnuz.bell.workflow.ListType
 import cn.edu.bnuz.bell.workflow.commands.AcceptCommand
 import cn.edu.bnuz.bell.workflow.commands.RejectCommand
+import cn.edu.bnuz.bell.workflow.commands.RevokeCommand
 import org.springframework.security.access.prepost.PreAuthorize
 
 @PreAuthorize('hasAuthority("PERM_DUALDEGREE_DEPT_ADMIN")')
@@ -53,6 +54,12 @@ class PaperMentorController {
                 bindData(cmd, request.JSON)
                 cmd.id = id as Long
                 paperMentorService.finish(checkerId, cmd)
+                break
+            case Event.ROLLBACK:
+                def cmd = new RevokeCommand()
+                bindData(cmd, request.JSON)
+                cmd.id = paperMentorId
+                paperMentorService.rollback(checkerId, cmd)
                 break
             default:
                 throw new BadRequestException()

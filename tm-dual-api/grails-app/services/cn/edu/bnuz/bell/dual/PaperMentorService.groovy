@@ -6,6 +6,7 @@ import cn.edu.bnuz.bell.http.NotFoundException
 import cn.edu.bnuz.bell.organization.Teacher
 import cn.edu.bnuz.bell.security.SecurityService
 import cn.edu.bnuz.bell.security.User
+import cn.edu.bnuz.bell.security.UserLogService
 import cn.edu.bnuz.bell.service.DataAccessService
 import cn.edu.bnuz.bell.workflow.DomainStateMachineHandler
 import cn.edu.bnuz.bell.workflow.ListCommand
@@ -16,6 +17,7 @@ import cn.edu.bnuz.bell.workflow.WorkflowInstance
 import cn.edu.bnuz.bell.workflow.Workitem
 import cn.edu.bnuz.bell.workflow.commands.AcceptCommand
 import cn.edu.bnuz.bell.workflow.commands.RejectCommand
+import cn.edu.bnuz.bell.workflow.commands.RevokeCommand
 import grails.gorm.transactions.Transactional
 
 @Transactional
@@ -24,6 +26,7 @@ class PaperMentorService {
     DataAccessService dataAccessService
     DomainStateMachineHandler domainStateMachineHandler
     ApplicationFormService applicationFormService
+    UserLogService userLogService
 
     def list(String userId, ListCommand cmd) {
         switch (cmd.type) {
@@ -305,6 +308,44 @@ and t not in (select distinct paperApprover from DegreeApplication where award.i
         domainStateMachineHandler.finish(form, teacherId, workitem.id)
         form.datePaperApproved = new Date()
         form.paperForm.comment = cmd.comment
+        form.save()
+    }
+
+    void rollback(String userId, RevokeCommand cmd) {
+        DegreeApplication form = DegreeApplication.get(cmd.id)
+        if (!form) {
+            throw new NotFoundException()
+        }
+        if (form.status != State.STEP4) {
+            throw new ForbiddenException()
+        }
+        // 找到workitem
+        def workitem = Workitem.findByInstanceAndActivityAndFromAndDateProcessedIsNull(
+                WorkflowInstance.load(form.workflowInstanceId),
+                WorkflowActivity.load("${DegreeApplication.WORKFLOW_ID}.approvePaper"),
+                User.load(userId))
+
+        if (!workitem) {
+            throw new BadRequestException()
+        }
+        workitem.delete()
+        domainStateMachineHandler.rollback(form, userId, cmd.comment, workitem.id)
+        if (cmd.comment) {
+            userLogService.log(securityService.userId, securityService.ipAddress, 'ROLLBACK', form, "撤回理由：${cmd.comment}")
+        }
+        List<Workitem> result = Workitem.executeQuery'''
+from Workitem where instance = :instance and activity = :activity and to = :to order by dateCreated desc
+''', [instance: WorkflowInstance.load(form.workflowInstanceId), activity: WorkflowActivity.load('dualdegree.application.checkPaper'),
+      to: User.load(userId)], [max: 1]
+        if (!result) {
+            throw new BadRequestException()
+        }
+        def revokeItem = result[0]
+        revokeItem.setDateProcessed(null)
+        revokeItem.setDateReceived(null)
+        revokeItem.setNote(null)
+        revokeItem.save()
+        form.paperApprover = null
         form.save()
     }
 }

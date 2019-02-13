@@ -1,8 +1,12 @@
 package cn.edu.bnuz.bell.dual
 
 import cn.edu.bnuz.bell.http.BadRequestException
+import cn.edu.bnuz.bell.http.ForbiddenException
+import cn.edu.bnuz.bell.http.NotFoundException
 import cn.edu.bnuz.bell.organization.Teacher
+import cn.edu.bnuz.bell.security.SecurityService
 import cn.edu.bnuz.bell.security.User
+import cn.edu.bnuz.bell.security.UserLogService
 import cn.edu.bnuz.bell.service.DataAccessService
 import cn.edu.bnuz.bell.workflow.Activities
 import cn.edu.bnuz.bell.workflow.DomainStateMachineHandler
@@ -14,6 +18,7 @@ import cn.edu.bnuz.bell.workflow.WorkflowInstance
 import cn.edu.bnuz.bell.workflow.Workitem
 import cn.edu.bnuz.bell.workflow.commands.AcceptCommand
 import cn.edu.bnuz.bell.workflow.commands.RejectCommand
+import cn.edu.bnuz.bell.workflow.commands.RevokeCommand
 import grails.gorm.transactions.Transactional
 
 @Transactional
@@ -21,6 +26,8 @@ class ApplicationCheckService {
     DataAccessService dataAccessService
     DomainStateMachineHandler domainStateMachineHandler
     ApplicationFormService applicationFormService
+    UserLogService userLogService
+    SecurityService securityService
 
     def list(String userId, ListCommand cmd) {
         switch (cmd.type) {
@@ -215,6 +222,52 @@ order by form.dateApproved desc
         DegreeApplication form = DegreeApplication.get(cmd.id)
         domainStateMachineHandler.reject(form, userId, Activities.CHECK, cmd.comment, workitemId)
         form.dateApproved = new Date()
+        form.save()
+    }
+
+    void rollback(String userId, RevokeCommand cmd) {
+        DegreeApplication form = DegreeApplication.get(cmd.id)
+        if (!form) {
+            throw new NotFoundException()
+        }
+        println form.status
+        if (!domainStateMachineHandler.canRollback(form) || (form.status != State.STEP2 && form.status != State.REJECTED)) {
+            throw new ForbiddenException()
+        }
+        // 找到最后workitem并删除
+        def workitem = Workitem.findByInstanceAndActivityAndFromAndDateProcessedIsNull(
+                WorkflowInstance.load(form.workflowInstanceId),
+                WorkflowActivity.load("${DegreeApplication.WORKFLOW_ID}.submitPaper"),
+                User.load(userId))
+        if (form.status == State.REJECTED) {
+            workitem = Workitem.findByInstanceAndActivityAndFromAndDateProcessedIsNull(
+                    WorkflowInstance.load(form.workflowInstanceId),
+                    WorkflowActivity.load("${DegreeApplication.WORKFLOW_ID}.view"),
+                    User.load(userId))
+        }
+
+        if (!workitem) {
+            throw new BadRequestException()
+        }
+        workitem.delete()
+        domainStateMachineHandler.rollback(form, userId, cmd.comment, workitem.id)
+        if (cmd.comment) {
+            userLogService.log(securityService.userId, securityService.ipAddress, 'ROLLBACK', form, "撤回理由：${cmd.comment}")
+        }
+        // 找到最后workitem，恢复标志
+        List<Workitem> result = Workitem.executeQuery'''
+from Workitem where instance = :instance and activity = :activity and to = :to order by dateCreated desc
+''', [instance: WorkflowInstance.load(form.workflowInstanceId), activity: WorkflowActivity.load('dualdegree.application.check'),
+      to: User.load(userId)], [max: 1]
+        if (!result) {
+            throw new BadRequestException()
+        }
+        def revokeItem = result[0]
+        revokeItem.setDateProcessed(null)
+        revokeItem.setDateReceived(null)
+        revokeItem.setNote(null)
+        revokeItem.save()
+        form.dateApproved = null
         form.save()
     }
 
