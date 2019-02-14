@@ -230,7 +230,6 @@ order by form.dateApproved desc
         if (!form) {
             throw new NotFoundException()
         }
-        println form.status
         if (!domainStateMachineHandler.canRollback(form) || (form.status != State.STEP2 && form.status != State.REJECTED)) {
             throw new ForbiddenException()
         }

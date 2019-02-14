@@ -13,7 +13,6 @@ class ApplicationAdministrateController {
     String filesPath
 
     def index(String departmentId, Long awardId, String status) {
-        println status
         def statusList = applicationAdministrateService.statusList(departmentId, awardId)
         if (status != 'undefined') {
             renderJson([
