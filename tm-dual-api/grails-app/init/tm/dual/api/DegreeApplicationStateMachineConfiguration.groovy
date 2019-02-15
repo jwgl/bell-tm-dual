@@ -11,6 +11,7 @@ import cn.edu.bnuz.bell.workflow.config.StandardActionConfiguration
 import cn.edu.bnuz.bell.workflow.events.EventData
 import cn.edu.bnuz.bell.workflow.events.ManualEventData
 import cn.edu.bnuz.bell.workflow.events.RejectEventData
+import cn.edu.bnuz.bell.workflow.events.SubmitEventData
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -35,7 +36,7 @@ class DegreeApplicationStateMachineConfiguration extends EnumStateMachineConfigu
                 .withStates()
                 .initial(State.CREATED)
                 .state(State.CREATED,   [actions.logEntryAction()], null)
-                .state(State.STEP1,     [actions.logEntryAction(), submittedEntryAction()], [actions.workitemProcessedAction()])
+                .state(State.STEP1,     [actions.logEntryAction(), step1EntryAction()], [actions.workitemProcessedAction()])
                 .state(State.STEP2,     [actions.logEntryAction(), approvedEntryAction()], [actions.workitemProcessedAction()])
                 .state(State.STEP3,     [actions.logEntryAction(), progressEntryAction()], [actions.workitemProcessedAction()])
                 .state(State.STEP4,     [actions.logEntryAction(), finishEntryAction()], [actions.workitemProcessedAction()])
@@ -47,80 +48,139 @@ class DegreeApplicationStateMachineConfiguration extends EnumStateMachineConfigu
     @Override
     void configure(StateMachineTransitionConfigurer<State, Event> transitions) throws Exception {
         transitions
-                .withInternal()
+            .withInternal()
                 .source(State.CREATED)
                 .event(Event.UPDATE)
                 .action(actions.logTransitionAction())
                 .and()
-                .withExternal()
+            .withExternal()
                 .source(State.CREATED)
                 .event(Event.SUBMIT)
                 .target(State.STEP1)
                 .and()
-                .withExternal()
+            .withExternal()
                 .source(State.STEP1)
                 .event(Event.NEXT)
                 .target(State.STEP2)
                 .and()
-                .withExternal()
+            .withExternal()
                 .source(State.STEP1)
                 .event(Event.REJECT)
                 .target(State.REJECTED)
                 .and()
-                .withInternal()
+            .withInternal()
                 .source(State.REJECTED)
                 .event(Event.UPDATE)
                 .action(actions.logTransitionAction())
                 .and()
-                .withExternal()
+            .withExternal()
                 .source(State.STEP2)
                 .event(Event.NEXT)
                 .target(State.STEP3)
                 .and()
-                .withExternal()
+            .withExternal()
                 .source(State.STEP3)
                 .event(Event.NEXT)
                 .target(State.STEP4)
                 .and()
-                .withExternal()
+            .withExternal()
                 .source(State.STEP3)
                 .event(Event.FINISH)
                 .target(State.FINISHED)
                 .and()
-                .withExternal()
+            .withExternal()
                 .source(State.STEP4)
                 .event(Event.FINISH)
                 .target(State.FINISHED)
                 .and()
-                .withExternal()
+            .withExternal()
                 .source(State.STEP4)
                 .event(Event.REJECT)
                 .target(State.STEP5)
                 .and()
-                .withExternal()
+            .withExternal()
                 .source(State.STEP3)
                 .event(Event.REJECT)
                 .target(State.STEP2)
                 .and()
-                .withInternal()
+            .withInternal()
                 .source(State.STEP2)
                 .event(Event.UPDATE)
                 .action(actions.logTransitionAction())
                 .and()
-                .withExternal()
+            .withExternal()
                 .source(State.REJECTED)
                 .event(Event.SUBMIT)
                 .target(State.STEP1)
                 .and()
-                .withExternal()
+            .withExternal()
                 .source(State.STEP5)
                 .event(Event.NEXT)
                 .target(State.STEP4)
+                .and()
+            .withExternal()
+                .source(State.REJECTED)
+                .event(Event.ROLLBACK)
+                .target(State.STEP1)
+                .and()
+            .withExternal()
+                .source(State.STEP2)
+                .event(Event.ROLLBACK)
+                .target(State.STEP1)
+                .and()
+            .withExternal()
+                .source(State.STEP4)
+                .event(Event.ROLLBACK)
+                .target(State.STEP3)
     }
 
     @Bean
     Action<State, Event> submittedEntryAction() {
         new SubmittedEntryAction(Activities.CHECK)
+    }
+
+    @Bean
+    Action<State, Event> step1EntryAction() {
+        new AbstractEntryAction() {
+            @Override
+            void execute(StateContext<State, Event> context) {
+                def data = context.getMessageHeader(EventData.KEY)
+                if (data instanceof SubmitEventData ) {
+                    def event = data as SubmitEventData
+                    def workflowInstance = event.entity.workflowInstance
+
+                    if (!workflowInstance) {
+                        workflowInstance = workflowService.createInstance(event.entity.workflowId, event.title, event.entity.id)
+                        event.entity.workflowInstance = workflowInstance
+                    }
+
+                    workflowService.createWorkitem(
+                            workflowInstance,
+                            event.fromUser,
+                            context.event,
+                            context.target.id,
+                            event.comment,
+                            event.ipAddress,
+                            event.toUser,
+                            Activities.CHECK,
+                    )
+
+                } else if (data instanceof ManualEventData) {
+                    def event = data as ManualEventData
+                    workflowService.createWorkitem(data.entity.workflowInstance,
+                            event.fromUser,
+                            context.event,
+                            context.target.id,
+                            event.comment,
+                            event.ipAddress,
+                            event.toUser,
+                            Activities.CHECK,
+                    )
+                } else {
+                    throw new Exception('Unsupported event type')
+                }
+            }
+        }
     }
 
     @Bean

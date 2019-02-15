@@ -12,8 +12,22 @@ class ApplicationAdministrateController {
     @Value('${bell.student.filesPath}')
     String filesPath
 
-    def index(String departmentId, Long awardId) {
-        renderJson applicationAdministrateService.list(departmentId, awardId)
+    def index(String departmentId, Long awardId, String status) {
+        def statusList = applicationAdministrateService.statusList(departmentId, awardId)
+        if (status != 'undefined') {
+            renderJson([
+                    statusList: statusList,
+                    applicationList: applicationAdministrateService.list(departmentId, awardId, status)
+                    ])
+        } else {
+            if (statusList && statusList.size()) {
+                renderJson([
+                        statusList: statusList,
+                        applicationList: applicationAdministrateService.list(departmentId, awardId, statusList[0].status as String)
+                ])
+            }
+        }
+
     }
 
     def show(String departmentId, Long awardId, Long id) {

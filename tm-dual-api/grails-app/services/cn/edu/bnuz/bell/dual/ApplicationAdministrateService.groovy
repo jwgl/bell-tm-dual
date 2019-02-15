@@ -1,6 +1,7 @@
 package cn.edu.bnuz.bell.dual
 
 import cn.edu.bnuz.bell.http.ForbiddenException
+import cn.edu.bnuz.bell.workflow.State
 import grails.gorm.transactions.Transactional
 
 @Transactional
@@ -8,7 +9,22 @@ class ApplicationAdministrateService {
     ApplicationFormService applicationFormService
     PaperFormService paperFormService
 
-    def list(String departmentId, Long awardId) {
+    def statusList(String departmentId, Long awardId) {
+        DegreeApplication.executeQuery '''
+select new map(
+form.status as status,
+count(*) as counts
+)
+from DegreeApplication form
+join form.award award
+join award.department department
+where department.id = :departmentId and award.id = :awardId
+group by form.status
+order by form.status
+''', [departmentId: departmentId, awardId: awardId]
+    }
+
+    def list(String departmentId, Long awardId, String status) {
         DegreeApplication.executeQuery '''
 select new map(
   form.id as id,
@@ -26,9 +42,9 @@ join student.adminClass adminClass
 join form.award award
 join award.department department
 left join form.paperApprover paperApprover
-where department.id = :departmentId and award.id = :awardId
+where department.id = :departmentId and award.id = :awardId and form.status = :status
 order by form.dateSubmitted
-''', [departmentId: departmentId, awardId: awardId]
+''', [departmentId: departmentId, awardId: awardId, status: status as State]
     }
 
     def getFormForReview(String departmentId, Long awardId, Long id) {
