@@ -70,7 +70,7 @@ class PictureController {
         def picturePath = "${filesPath}/${awardId}/${userId}"
         File file = new File(picturePath, fileName)
         response.contentType = URLConnection.guessContentTypeFromName(file.getName())
-        response.setHeader("Content-disposition","attachment;filename='${file.name}'")
+        response.setHeader("Content-disposition","attachment;filename=${file.name}")
         response.outputStream << file.bytes
         response.outputStream.flush()
     }
