@@ -60,6 +60,7 @@ class UrlMappings {
             }
             "/papermentors"(resources: 'paperMentor') {
                 "/tousers"(controller: 'paperMentor', action: 'tousers', method: 'GET')
+                "/mentorsExcept"(controller: 'paperMentor', action: 'mentorsExcept', method: 'GET')
                 "/workitems"(resources: 'paperMentor', includes: ['show', 'patch'])
             }
         }
