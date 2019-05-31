@@ -95,6 +95,7 @@ where m.id = :id
 select new map(t.id as id, t.name as name)
 from Mentor m 
 join m.teacher t 
+join t.department d
 where d.department.id = :department
 ''', [department: securityService.departmentId]
     }

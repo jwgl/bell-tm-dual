@@ -30,7 +30,7 @@ class PictureController {
             desFileName = 'none.jpg'
         }
         File file = new File(picturePath, "${desFileName}")
-        Boolean thumbnail = (desFileName != 'none.jpg') && (desFileName != 'pdf.jpg')
+        Boolean thumbnail = (desFileName != 'none.jpg') && (desFileName != 'pdf.jpg') && (desFileName != 'flow.png')
         output(file, thumbnail)
     }
 
@@ -70,7 +70,7 @@ class PictureController {
         def picturePath = "${filesPath}/${awardId}/${userId}"
         File file = new File(picturePath, fileName)
         response.contentType = URLConnection.guessContentTypeFromName(file.getName())
-        response.setHeader("Content-disposition","attachment;filename='${file.name}'")
+        response.setHeader("Content-disposition","attachment;filename=${file.name}")
         response.outputStream << file.bytes
         response.outputStream.flush()
     }

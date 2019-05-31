@@ -71,7 +71,17 @@ class PaperMentorController {
         }
     }
 
+    /**
+     * @return 返回所有导师列表
+     */
     def tousers(String checkerId, Long paperMentorId) {
         renderJson paperMentorService.tousers()
+    }
+
+    /**
+     * @return 返回导师列表，排除已分配过的导师
+     */
+    def mentorsExcept(String checkerId, Long paperMentorId) {
+        renderJson paperMentorService.mentorsExcept()
     }
 }
