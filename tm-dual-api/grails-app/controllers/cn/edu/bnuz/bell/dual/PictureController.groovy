@@ -30,7 +30,7 @@ class PictureController {
             desFileName = 'none.jpg'
         }
         File file = new File(picturePath, "${desFileName}")
-        Boolean thumbnail = (desFileName != 'none.jpg') && (desFileName != 'pdf.jpg')
+        Boolean thumbnail = (desFileName != 'none.jpg') && (desFileName != 'pdf.jpg') && (desFileName != 'flow.png')
         output(file, thumbnail)
     }
 
