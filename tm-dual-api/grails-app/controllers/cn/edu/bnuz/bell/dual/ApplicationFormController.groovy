@@ -154,6 +154,13 @@ class ApplicationFormController {
 
     }
 
+    /**
+     * 照片上传说明
+     */
+    def notice() {
+        renderJson applicationFormService.getNotice()
+    }
+
     private static Boolean isExpire(DegreeApplication application) {
         def now = LocalDate.now()
         if (application.status == State.CREATED && now.isAfter(application.award.requestEnd)) {

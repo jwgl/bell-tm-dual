@@ -157,4 +157,5 @@ class DegreeApplication implements StateObject {
     }
 
     static final WORKFLOW_ID = 'dualdegree.application'
+    static final CONFIG_PICTURE = 'dual.picture'
 }
