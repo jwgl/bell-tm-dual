@@ -46,6 +46,7 @@ class UrlMappings {
                 "/workitems"(resources: 'paperForm', includes: ['show', 'patch'])
                 collection {
                     "/upload"(controller: 'applicationForm', action: 'upload', method: 'POST')
+                    "/notice"(controller: 'applicationForm', action: 'notice', method: 'GET')
                 }
             }
         }

@@ -7,6 +7,7 @@ import cn.edu.bnuz.bell.organization.Department
 import cn.edu.bnuz.bell.organization.Student
 import cn.edu.bnuz.bell.organization.Teacher
 import cn.edu.bnuz.bell.security.SecurityService
+import cn.edu.bnuz.bell.system.SystemConfigService
 import cn.edu.bnuz.bell.utils.CollectionUtils
 import cn.edu.bnuz.bell.utils.GroupCondition
 import cn.edu.bnuz.bell.workflow.DomainStateMachineHandler
@@ -23,6 +24,7 @@ class ApplicationFormService {
     String filesPath
     DomainStateMachineHandler domainStateMachineHandler
     SecurityService securityService
+    SystemConfigService systemConfigService
 
     /**
      * @param userId 申请人Id
@@ -349,5 +351,11 @@ order by a.dateCreated desc''', [departmentId: securityService.departmentId], [m
 select note from Workitem where instance = :instance and to.id = :userId order by dateCreated desc
 ''', [instance: DegreeApplication.load(id).workflowInstance, userId: securityService.userId], [max: 1]
         return result ? result[0] : null
+    }
+
+    def getNotice() {
+        [
+                notice: systemConfigService.get(DegreeApplication.CONFIG_PICTURE, ''),
+        ]
     }
 }
