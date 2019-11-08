@@ -20,6 +20,12 @@ class Award {
     Department department
 
     /**
+     * 超级开关
+     */
+    Boolean applicationOn
+    Boolean paperOn
+
+    /**
      * 当前日期
      */
     LocalDate today = LocalDate.now()
@@ -47,5 +53,7 @@ class Award {
         creator                 comment: '创建人'
         dateCreated             comment: '创建日期'
         department              comment: '适用学院'
+        applicationOn           comment: '允许超期申请'
+        paperOn                 comment: '允许超期提交论文'
     }
 }

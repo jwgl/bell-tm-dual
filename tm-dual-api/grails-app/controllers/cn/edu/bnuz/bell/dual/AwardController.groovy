@@ -54,4 +54,9 @@ class AwardController {
         awardService.update(cmd)
         renderOk()
     }
+
+    def patch(Long id, String key) {
+        awardService.toggle(id, key)
+        renderOk()
+    }
 }
