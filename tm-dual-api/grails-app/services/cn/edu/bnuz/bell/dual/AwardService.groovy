@@ -62,6 +62,8 @@ order by ba.dateCreated desc
                 approvalEnd: cmd.approvalEndToDate,
                 creator: Teacher.load(securityService.userId),
                 dateCreated: new Date(),
+                applicationOn: false,
+                paperOn: false,
                 department: Department.load(cmd.departmentId)
         )
 
@@ -97,9 +99,10 @@ select new map(
     award.paperEnd as paperEnd,
     award.approvalEnd as approvalEnd,
     award.content as content,
+    award.applicationOn as applicationOn,
+    award.paperOn as paperOn,
     d.id as departmentId,
     d.name as departmentName
-    
 )
 from Award award 
 join award.department d
@@ -108,7 +111,10 @@ where award.id = :id
         if(!results) {
             throw new NotFoundException()
         }
-        return results[0]
+        // 超级开关先只给特定学院开放
+        def form  = results[0]
+        form['toggleShow'] = form.departmentId == '20'
+        return form
     }
 
     /**
@@ -127,5 +133,11 @@ where award.id = :id
             form.save(flush: true)
             return form
         }
+    }
+
+    def toggle(Long id, String key) {
+        Award form = Award.load(id)
+        form.setProperty(key, !form.getProperty(key))
+        form.save(flush: true)
     }
 }

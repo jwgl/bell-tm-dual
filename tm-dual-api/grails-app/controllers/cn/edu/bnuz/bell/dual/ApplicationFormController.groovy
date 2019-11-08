@@ -1,6 +1,7 @@
 package cn.edu.bnuz.bell.dual
 
 import cn.edu.bnuz.bell.http.ForbiddenException
+import cn.edu.bnuz.bell.organization.Student
 import cn.edu.bnuz.bell.workflow.Event
 import cn.edu.bnuz.bell.workflow.State
 import cn.edu.bnuz.bell.workflow.commands.SubmitCommand
@@ -61,7 +62,8 @@ class ApplicationFormController {
                 award: awardPublicService.getAwardInfo((Long)form.awardId),
                 fileNames: applicationFormService.findFiles(studentId, form.awardId),
                 paperForm: paperFormService.getPaperForm(studentId, id),
-                latestAnswer: applicationFormService.getLatestAnswer(id)
+                latestAnswer: applicationFormService.getLatestAnswer(id),
+                privilege: StudentAbroad.findByStudent(Student.load(studentId)).privilege,
         ])
     }
 

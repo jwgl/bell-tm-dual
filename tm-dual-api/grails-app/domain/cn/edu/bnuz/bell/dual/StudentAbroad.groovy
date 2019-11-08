@@ -12,6 +12,7 @@ class StudentAbroad {
     Date dateCreated
     AgreementRegion agreementRegion
     Boolean enabled
+    Boolean privilege
 
     static mapping = {
         comment          '出国学生'
@@ -22,6 +23,7 @@ class StudentAbroad {
         dateCreated      comment: '导入操作的日期'
         agreementRegion  comment: '参加的项目'
         enabled          comment: '是否有效'
+        privilege        comment: '超期特权'
     }
 
     static constraints = {
