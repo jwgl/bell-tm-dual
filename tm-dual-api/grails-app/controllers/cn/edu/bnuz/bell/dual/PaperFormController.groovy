@@ -2,6 +2,7 @@ package cn.edu.bnuz.bell.dual
 
 import cn.edu.bnuz.bell.http.BadRequestException
 import cn.edu.bnuz.bell.http.ForbiddenException
+import cn.edu.bnuz.bell.http.NotFoundException
 import cn.edu.bnuz.bell.http.ServiceExceptionHandler
 import cn.edu.bnuz.bell.workflow.Event
 import cn.edu.bnuz.bell.workflow.State
@@ -53,6 +54,11 @@ class PaperFormController implements ServiceExceptionHandler {
                 def cmd = new AcceptCommand()
                 bindData(cmd, request.JSON)
                 cmd.id = applicationFormId
+                def users = paperFormService.getUser(applicationFormId)
+                if (!users) {
+                    throw new NotFoundException()
+                }
+                cmd.to = users[0].id
                 paperFormService.next(studentId, cmd, id)
                 break
             default:
