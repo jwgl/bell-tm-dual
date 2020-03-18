@@ -11,11 +11,16 @@ import cn.edu.bnuz.bell.system.SystemConfigService
 import cn.edu.bnuz.bell.utils.CollectionUtils
 import cn.edu.bnuz.bell.utils.GroupCondition
 import cn.edu.bnuz.bell.workflow.DomainStateMachineHandler
+import cn.edu.bnuz.bell.workflow.State
 import cn.edu.bnuz.bell.workflow.Workitem
 import cn.edu.bnuz.bell.workflow.commands.SubmitCommand
 import grails.gorm.transactions.Transactional
 import org.springframework.beans.factory.annotation.Value
 
+import java.nio.file.FileSystems
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.StandardCopyOption
 import java.time.LocalDate
 
 @Transactional
@@ -69,31 +74,42 @@ and ba.department.id = :departmentId
             // 非法访问
             throw new BadRequestException()
         }
-        def now = new Date()
+        // 如果曾经申请过，并通过论文审核，直接修改award, 移动相应文件
+        def da = DegreeApplication.findByStudentAndStatus(student, State.FINISHED)
+        if (da) {
+            Path srcPath = FileSystems.getDefault().getPath ("${filesPath}/${da.award.id}/${userId}")
+            Path desPath = FileSystems.getDefault().getPath ("${filesPath}/${cmd.awardId}/${userId}")
+            Files.move(srcPath, desPath, StandardCopyOption.REPLACE_EXISTING)
+            da.setAward(award)
+            da.save()
+            return da
+        } else {
+            def now = new Date()
 
-        DegreeApplication form = new DegreeApplication(
-                award: award,
-                student: student,
-                approver: award.creator,
-                dateCreated: LocalDate.now(),
-                universityCooperative: cmd.universityCooperative,
-                majorCooperative: cmd.majorCooperative,
-                email: cmd.email,
-                linkman: cmd.linkman,
-                phone: cmd.phone,
-                dateModified: now,
-                bachelor: cmd.bachelor,
-                bachelorYear: cmd.bachelorYear,
-                status: domainStateMachineHandler.initialState
-        )
+            DegreeApplication form = new DegreeApplication(
+                    award: award,
+                    student: student,
+                    approver: award.creator,
+                    dateCreated: LocalDate.now(),
+                    universityCooperative: cmd.universityCooperative,
+                    majorCooperative: cmd.majorCooperative,
+                    email: cmd.email,
+                    linkman: cmd.linkman,
+                    phone: cmd.phone,
+                    dateModified: now,
+                    bachelor: cmd.bachelor,
+                    bachelorYear: cmd.bachelorYear,
+                    status: domainStateMachineHandler.initialState
+            )
 
-        if (!form.save()) {
-            form.errors.each {
-                println it
+            if (!form.save()) {
+                form.errors.each {
+                    println it
+                }
             }
+            domainStateMachineHandler.create(form, userId)
+            return form
         }
-        domainStateMachineHandler.create(form, userId)
-        return form
     }
 
     /**
@@ -227,7 +243,8 @@ where form.id = :id
                         approvalEnd: award.approvalEnd
                 ],
                 universities: CollectionUtils.groupBy(universities, conditions),
-                fileNames: findFiles(userId, awardId)
+                fileNames: findFiles(userId, awardId),
+                pass: DegreeApplication.findByStudentAndStatus(student, State.FINISHED) ? true : false
         ]
     }
 
